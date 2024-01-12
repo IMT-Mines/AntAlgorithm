@@ -6,7 +6,7 @@ class Time {
 
     getFormattedTime() {
         let minutes = Math.floor(this.time / 60);
-        let seconds = this.time % 60;
+        let seconds = Math.floor(this.time % 60);
         return `${minutes < 10 ? "0" + minutes : minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
     }
 
@@ -18,8 +18,8 @@ class Time {
         this.time = time;
     }
 
-    increment() {
-        this.time++;
+    increment(deltaTime) {
+        this.time += deltaTime / 1000;
     }
 
 }
