@@ -1,25 +1,38 @@
 class Time {
 
     constructor() {
-        this.time = 0;
+        this.startTime = null;
+        this.pausedTime = null;
+        this.paused = false;
     }
 
-    getFormattedTime() {
-        let minutes = Math.floor(this.time / 60);
-        let seconds = Math.floor(this.time % 60);
-        return `${minutes < 10 ? "0" + minutes : minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+    start() {
+        this.startTime = new Date();
     }
 
-    getTime() {
-        return this.time;
+    pause() {
+        this.pausedTime = new Date();
+        this.paused = true;
     }
 
-    setTime(time) {
-        this.time = time;
+    resume() {
+        this.paused = false;
+        this.startTime = new Date(this.startTime.getTime() + (new Date().getTime() - this.pausedTime.getTime()));
     }
 
-    increment(deltaTime) {
-        this.time += deltaTime / 1000;
+    getElapsedTime() {
+        if (this.paused) {
+            return this.pausedTime - this.startTime;
+        } else {
+            return new Date() - this.startTime;
+        }
+    }
+
+    getFormattedElapsedTime() {
+        const elapsedTime = this.getElapsedTime();
+        const minutes = Math.floor(elapsedTime / 60000);
+        const seconds = Math.floor((elapsedTime - minutes * 60000) / 1000);
+        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
 }

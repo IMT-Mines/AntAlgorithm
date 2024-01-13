@@ -3,48 +3,60 @@ class Model {
     constructor() {
         this.clock = new Clock(this.tick.bind(this));
         this.time = new Time();
-        this.grid = new Grid();
-        this.clock.run();
+        this.grid = new Grid(20);
     }
 
     bindDisplayChronometer(callBack) {
         this.updateChronometer = callBack;
     }
 
-    bindDisplayCanvasPoint(callBack) {
-        this.displayCanvasPoint = callBack;
+    bindDisplayCanvasCells(callBack) {
+        this.displayCanvasCells = callBack;
+    }
+
+    bindUpdateActionButtonText(callback) {
+        this.updateActionButtonText = callback;
     }
 
     tick(deltaTime) {
-        this.time.increment(deltaTime);
-        this.updateChronometer(this.time.getFormattedTime());
-        this.displayCanvasPoint(Math.random() * 500, Math.random() * 500);
+        this.updateChronometer(this.time.getFormattedElapsedTime());
+        this.displayCanvasCells(this.grid.getCells());
     }
 
     bindActionButton() {
-        this.clock.setFps(60);
+        if (this.clock.running) {
+            this.clock.stop();
+            this.time.pause();
+            this.updateActionButtonText("Resume");
+        } else {
+            if (this.time.paused) {
+                this.time.resume();
+            } else {
+                this.time.start();
+            }
+            this.updateActionButtonText("Pause");
+            this.clock.start();
+        }
     }
 }
 
 class View {
-    constructor(divId) {
-        this.div;
+    constructor() {
         this.chronometer;
         this.canvas;
-        this.initView(divId);
+        this.actionButton;
+        this.initView();
     }
 
     bindActionButton(callback) {
         this.bindActionButton = callback;
     }
 
-    initView(divId) {
-        this.div = document.getElementById(divId);
+    initView() {
         this.chronometer = document.getElementById("chronometer");
-        const canvas = document.getElementById('canvas');
-        this.canvas = new Canvas(canvas.getContext('2d'));
-        const actionButton = document.getElementById('action');
-        actionButton.addEventListener('click', () => {
+        this.canvas = new Canvas(document.getElementById('canvas').getContext('2d'));
+        this.actionButton = document.getElementById('action');
+        this.actionButton.addEventListener('click', () => {
             this.bindActionButton();
         });
     }
@@ -53,8 +65,12 @@ class View {
         this.chronometer.innerHTML = value;
     }
 
-    displayCanvasPoint(x, y) {
-        this.canvas.drawPoint(x, y)
+    displayCanvasCells(cells) {
+        this.canvas.drawCells(cells);
+    }
+
+    updateActionButtonText(text) {
+        this.actionButton.innerText = text;
     }
 }
 
@@ -66,19 +82,26 @@ class Controller {
         this.bindDisplayChronometer = this.bindDisplayChronometer.bind(this);
         this.model.bindDisplayChronometer(this.bindDisplayChronometer);
 
-        this.bindDisplayCanvasPoint = this.bindDisplayCanvasPoint.bind(this);
-        this.model.bindDisplayCanvasPoint(this.bindDisplayCanvasPoint);
+        this.bindDisplayCanvasCells = this.bindDisplayCanvasCells.bind(this);
+        this.model.bindDisplayCanvasCells(this.bindDisplayCanvasCells);
 
         this.bindActionButton = this.bindActionButton.bind(this);
         this.view.bindActionButton(this.bindActionButton);
+
+        this.bindUpdateActionButtonText = this.bindUpdateActionButtonText.bind(this);
+        this.model.bindUpdateActionButtonText(this.bindUpdateActionButtonText);
+    }
+
+    bindUpdateActionButtonText(text) {
+        this.view.updateActionButtonText(text);
     }
 
     bindDisplayChronometer(value) {
         this.view.displayChronometer(value);
     }
 
-    bindDisplayCanvasPoint(x, y) {
-        this.view.displayCanvasPoint(x, y);
+    bindDisplayCanvasCells(x, y) {
+        this.view.displayCanvasCells(x, y);
     }
 
     bindActionButton () {
@@ -87,4 +110,4 @@ class Controller {
 
 }
 
-const app = new Controller(new Model(), new View("app"));
+const app = new Controller(new Model(), new View());
