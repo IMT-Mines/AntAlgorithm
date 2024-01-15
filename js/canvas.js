@@ -10,12 +10,14 @@ class Canvas {
         this.ctx.scale(devicePixelRatio, devicePixelRatio);
     }
 
-    drawCells(info) {
-        const cells = info[0];
-        const antsMap = info[1];
-
+    draw(cells, antsMap) {
         const cellWidth = this.width / cells[0].length;
         const cellHeight = this.height / cells.length;
+        this.drawCells(cells, cellWidth, cellHeight);
+        this.drawAnts(antsMap, cellWidth, cellHeight);
+    }
+
+    drawCells(cells, cellWidth, cellHeight) {
         this.ctx.clearRect(0, 0, this.width, this.height);
         for (let x = 0; x < cells.length; x++) {
             for (let y = 0; y < cells[x].length; y++) {
@@ -23,8 +25,11 @@ class Canvas {
                 this.ctx.fillRect(y * cellWidth, x * cellHeight, cellWidth, cellHeight);
             }
         }
+    }
+
+    drawAnts(antsMap, cellWidth, cellHeight) {
         for (let ant of antsMap.keys()) {
-            this.ctx.fillStyle = ant.color;
+            this.ctx.fillStyle = ant.getColor();
             const cell = antsMap.get(ant);
             // random between 0 and 1
             const randomNumberBetween0And1 = Math.random();
@@ -32,9 +37,7 @@ class Canvas {
             const x = cell.x + randomNumberBetween0And1 / 2
             const y = cell.y + randomNumberBetween0And1 / 2
 
-            this.ctx.fillRect(y * cellWidth, x * cellHeight, cellWidth / 4, cellHeight / 4);
-
-
+            this.ctx.fillRect(y * cellWidth, x * cellHeight, cellWidth * 0.6, cellHeight * 0.6);
         }
     }
 

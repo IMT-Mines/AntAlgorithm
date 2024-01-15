@@ -31,5 +31,8 @@ class AntsManager {
         }
     }
 
+    getAntsMap() {
+        return this.ants;
+    }
 
 }

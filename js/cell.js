@@ -4,6 +4,7 @@ class Cell {
         this.x = x;
         this.y = y;
         this.color = "#FFFFFF";
+        this.visited = false; // for maze generation
     }
 }
 
