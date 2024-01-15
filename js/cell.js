@@ -5,7 +5,6 @@ class Cell {
         this.y = y;
         this.color = "#FFFFFF";
     }
-
 }
 
 class Obstacle extends Cell {
@@ -33,4 +32,15 @@ class Start extends Cell {
         this.color = "#00FF00";
     }
 
+
+
 }
+
+
+// class Free extends Cell {
+//     constructor(x, y, qty = 0.0) {
+//         super(x, y);
+//         this._qty = qty;
+//     }
+//
+// }

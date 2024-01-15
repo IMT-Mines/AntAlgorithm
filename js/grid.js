@@ -1,6 +1,7 @@
 class Grid {
 
-    constructor(cellNumber) {
+    constructor(cellNumber, antsManager) {
+        this.antsManager = antsManager;
         this.cells = [];
         this.initCells(cellNumber);
     }
@@ -49,6 +50,7 @@ class Grid {
                         break;
                     case 3:
                         this.cells[x][y] = new Start(x, y);
+                        this.antsManager.initAnts(this.cells[x][y], 10);
                         break;
                 }
             }
@@ -56,7 +58,7 @@ class Grid {
     }
 
     getCells() {
-        return this.cells;
+        return [this.cells, this.antsManager.ants];
     }
 
     getCell(x, y) {
@@ -65,6 +67,27 @@ class Grid {
 
     setCell(x, y, value) {
         this.cells[x][y] = value;
+    }
+
+    getNeighbours(cell) {
+        const neighbours = [];
+        if (cell.x > 0 && this.checkCellIsFree(this.getCell(cell.x - 1, cell.y))) {
+            neighbours.push(this.cells[cell.x - 1][cell.y]);
+        }
+        if (cell.x < this.cells.length - 1 && this.checkCellIsFree(this.getCell(cell.x + 1, cell.y))) {
+            neighbours.push(this.cells[cell.x + 1][cell.y]);
+        }
+        if (cell.y > 0 && this.checkCellIsFree(this.getCell(cell.x, cell.y - 1))) {
+            neighbours.push(this.cells[cell.x][cell.y - 1]);
+        }
+        if (cell.y < this.cells[0].length - 1 && this.checkCellIsFree(this.getCell(cell.x, cell.y + 1))) {
+            neighbours.push(this.cells[cell.x][cell.y + 1]);
+        }
+        return neighbours;
+    }
+
+    checkCellIsFree(cell) {
+        return !(cell instanceof Obstacle);
     }
 
 }
