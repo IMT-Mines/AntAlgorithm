@@ -3,7 +3,7 @@ class Model {
     constructor() {
         this.clock = new Clock(this.tick.bind(this));
         this.time = new Time();
-        this.grid = new Grid(20);
+        this.grid = new Grid(18);
     }
 
     bindDisplayChronometer(callBack) {

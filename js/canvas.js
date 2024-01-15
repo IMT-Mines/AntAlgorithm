@@ -4,7 +4,6 @@ class Canvas {
         this.ctx.fillStyle = "white";
         this.width = this.ctx.canvas.width;
         this.height = this.ctx.canvas.height;
-        console.log(window.devicePixelRatio)
         const devicePixelRatio = 10;
         this.ctx.canvas.width *= devicePixelRatio;
         this.ctx.canvas.height *= devicePixelRatio;
