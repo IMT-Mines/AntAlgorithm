@@ -3,7 +3,8 @@ class Model {
     constructor() {
         this.clock = new Clock(this.tick.bind(this));
         this.time = new Time();
-        this.grid = new Grid(18);
+        this.antsManager = new AntsManager();
+        this.grid = new Grid(18, this.antsManager);
     }
 
     bindDisplayChronometer(callBack) {
@@ -20,6 +21,9 @@ class Model {
 
     tick(deltaTime) {
         this.updateChronometer(this.time.getFormattedElapsedTime());
+        // apply rules for ants
+        this.antsManager.moveAnts(this.grid);
+
         this.displayCanvasCells(this.grid.getCells());
     }
 
@@ -100,8 +104,8 @@ class Controller {
         this.view.displayChronometer(value);
     }
 
-    bindDisplayCanvasCells(x, y) {
-        this.view.displayCanvasCells(x, y);
+    bindDisplayCanvasCells(cells) {
+        this.view.displayCanvasCells(cells);
     }
 
     bindActionButton () {
