@@ -6,6 +6,7 @@ class Grid {
         this.initCells(cellNumber);
     }
 
+
     initCells(cellNumber, foodNumber = 4, additionalObstaclesRatio = 0.2) {
         this.generateDefaultGrid(cellNumber)
         this.generateMaze(cellNumber, additionalObstaclesRatio);
@@ -30,12 +31,12 @@ class Grid {
             const neighbours = this.getNeighbours(currentCell, false, 2).filter(neighbour => !neighbour.visited);
             if (neighbours.length > 0) {
                 const randomCell = neighbours[Math.floor(Math.random() * neighbours.length)];
-                const newCell = new Cell(randomCell.x, randomCell.y);
+                const newCell = new Free(randomCell.x, randomCell.y);
                 newCell.visited = true;
                 this.setCell(newCell.x, newCell.y, newCell);
                 stack.push(currentCell);
                 const vector = { x: (newCell.x - currentCell.x) / 2, y: (newCell.y - currentCell.y) / 2 };
-                const newBetweenCell = new Cell(currentCell.x + vector.x, currentCell.y + vector.y);
+                const newBetweenCell = new Free(currentCell.x + vector.x, currentCell.y + vector.y);
                 this.setCell(newBetweenCell.x, newBetweenCell.y, newBetweenCell);
                 currentCell = newCell;
             } else {
@@ -53,7 +54,7 @@ class Grid {
         for (let row = 1; row < cellNumber - 1; row++)
             for (let col = 1; col < cellNumber - 1; col++)
                 if (this.cells[row][col] instanceof Obstacle && Math.random() < additionalObstaclesRatio)
-                    this.setCell(row, col, new Cell(row, col));
+                    this.setCell(row, col, new Free(row, col));
     }
 
     generateFood(cellNumber, foodNumber) {
@@ -114,6 +115,17 @@ class Grid {
 
     getStartCell() {
         return this.startCell;
+    }
+
+    updatePheromones(rate) {
+        for (let row = 0; row < this.cells.length; row++) {
+            for (let col = 0; col < this.cells[row].length; col++) {
+                if (this.cells[row][col] instanceof Free) {
+                    this.cells[row][col].pheromone *= rate;
+                }
+            }
+        }
+
     }
 
 }

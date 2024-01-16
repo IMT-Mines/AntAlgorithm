@@ -1,11 +1,15 @@
 class Model {
 
+    SIZE = 31;
+    ANTS_COUNT = 30;
+    PHEROMONE_EVAPORATION_RATE = 0.955;
+
     constructor() {
         this.clock = new Clock(this.tick.bind(this));
         this.time = new Time();
         this.antsManager = new AntsManager();
-        this.grid = new Grid(51);
-        this.antsManager.initAnts(this.grid.startCell, 5);
+        this.grid = new Grid(this.SIZE);
+        this.antsManager.initAnts(this.grid.startCell, this.ANTS_COUNT);
     }
 
     bindDisplayChronometer(callBack) {
@@ -23,8 +27,12 @@ class Model {
     tick(deltaTime) {
         // this.updateChronometer(this.clock.actualFps);
         this.updateChronometer(this.time.getFormattedElapsedTime());
+
         // apply rules for ants
         this.antsManager.moveAnts(this.grid);
+        this.grid.updatePheromones(this.PHEROMONE_EVAPORATION_RATE);
+
+
         this.displayCanvasCells(this.grid.getCells(), this.antsManager.ants);
     }
 

@@ -23,6 +23,14 @@ class Canvas {
             for (let y = 0; y < cells[x].length; y++) {
                 this.ctx.fillStyle = cells[x][y].color;
                 this.ctx.fillRect(y * cellWidth, x * cellHeight, cellWidth, cellHeight);
+
+
+                // Pheromone
+                if (cells[x][y] instanceof Free) {
+                    const color = Math.floor(cells[x][y].pheromone * 255);
+                    this.ctx.fillStyle = color === 0 ? "white" : `rgb(${color}, 0, ${255 - color})`;
+                    this.ctx.fillRect(y * cellWidth, x * cellHeight, cellWidth, cellHeight);
+                }
             }
         }
     }
