@@ -90,6 +90,48 @@ class Grid {
         this.cells[row][col] = cell;
     }
 
+    getShortestPath(cell, ant) {
+        const startCell = this.getStartCell();
+        const distance = new Map();
+        const previous = new Map();
+        const priorityQueue = new PriorityQueue();
+
+        for (const cell of ant.getHistory()) {
+            distance.set(cell, Infinity);
+            previous.set(cell, null);
+        }
+
+        distance.set(cell, 0);
+        priorityQueue.add(cell, 0);
+
+        while (!priorityQueue.isEmpty()) {
+            const currentCell = priorityQueue.remove();
+
+            if (currentCell === startCell)
+                ant.setHistory(this.reconstructPath(previous, currentCell));
+
+            const neighbours = this.getNeighbours(currentCell)
+                .filter(neighbour => ant.getHistory().includes(neighbour));
+            for (const neighbour of neighbours) {
+                const tentativeDistance = distance.get(currentCell) + 1;
+                if (tentativeDistance < distance.get(neighbour)) {
+                    distance.set(neighbour, tentativeDistance);
+                    previous.set(neighbour, currentCell);
+                    priorityQueue.add(neighbour, tentativeDistance);
+                }
+            }
+        }
+    }
+
+    reconstructPath(previous, currentCell) {
+        const path = [];
+        while (currentCell !== null) {
+            path.unshift(currentCell);
+            currentCell = previous.get(currentCell);
+        }
+        return path.reverse();
+    }
+
     getNeighbours(cell, checkIfFree = true, neighboursDistance = 1) {
         const neighbours = [];
         const coordinates = [

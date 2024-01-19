@@ -16,6 +16,10 @@ class Ant {
         return this.history;
     }
 
+    setHistory(history) {
+        this.history = history;
+    }
+
     isBackToStartCell() {
         return this.backToStartCell;
     }

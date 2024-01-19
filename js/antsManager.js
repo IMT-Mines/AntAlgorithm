@@ -50,6 +50,7 @@ class AntsManager {
 
                 if (chosenCell instanceof Food) {
                     ant.setBackToStartCell(true);
+                    this.grid.getShortestPath(chosenCell, ant);
                 }
             } else {
                 this.backToStartCell(ant);
@@ -77,10 +78,6 @@ class AntsManager {
                 potentialCells.push(cells[i]);
             }
         }
-        console.log(probabilities)
-        console.log("Cells", cells)
-        console.log("potentialCells", potentialCells);
-        console.log("maxProbability", maxProbability);
 
         const finalCell = potentialCells[Math.floor(Math.random() * potentialCells.length)];
         if (!finalCell) {
