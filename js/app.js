@@ -1,7 +1,7 @@
 class Model {
 
-    SIZE = 31;
-    ANTS_COUNT = 3;
+    SIZE = 11;
+    ANTS_COUNT = 1;
     PHEROMONE_EVAPORATION_RATE = 0.995;
 
     constructor() {

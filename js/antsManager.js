@@ -1,8 +1,5 @@
 class AntsManager {
 
-    // map ant to cell
-
-
     constructor() {
         this.ants = new Map();
     }
@@ -10,7 +7,7 @@ class AntsManager {
     initAnts(cell, antNumber) {
         for (let i = 0; i < antNumber; i++) {
             const ant = new Ant();
-            ant.history.push(cell);
+            ant.getHistory().push(cell)
             this.ants.set(ant, cell);
         }
     }
@@ -22,40 +19,36 @@ class AntsManager {
 
         for (let ant of this.ants.keys()) {
 
-            if (!ant.isBackToStartCell) {
-
-
+            if (!ant.isBackToStartCell()) {
                 const currentCell = this.ants.get(ant);
                 const neighbours = grid.getNeighbours(currentCell);
+                const probability = [];
 
                 let sumDenominator = 0;
 
                 for (let neighbour of neighbours) {
                     if (neighbour instanceof Start) continue;
-
                     sumDenominator += EXPLORATION_RATE + neighbour.pheromone ** ALPHA;
                 }
 
-                let probability = new Map();
                 for (let neighbour of neighbours) {
-                    if (neighbour instanceof Start) continue;
+                    if (neighbour instanceof Start) {
+                        probability.push(0);
+                    }
 
                     const numerator = EXPLORATION_RATE + neighbour.pheromone ** ALPHA;
                     const result = numerator / sumDenominator;
 
-                    probability.set(neighbour, result);
+                    probability.push(result);
                 }
 
-                const chosenCell = this.selectCell(Array.from(probability.keys()), Array.from(probability.values()));
+                const chosenCell = this.selectCell(ant, neighbours, probability);
 
-                // Mise à jour de la position de la fourmi
                 this.ants.set(ant, chosenCell);
-                ant.history.push(chosenCell);
+                ant.getHistory().push(chosenCell);
 
-                // Gestion du cas où la fourmi est de retour à la cellule de départ
                 if (chosenCell instanceof Food) {
-                    ant.isBackToStartCell = true;
-
+                    ant.setBackToStartCell(true);
                 }
             } else {
                 this.backToStartCell(ant);
@@ -63,34 +56,48 @@ class AntsManager {
         }
     }
 
-    selectCell(cells, probabilities) {
-        const choice = Math.random();
-        let cumulativeProbability = 0;
-
-        for (let i = 0; i < cells.length; i++) {
-            cumulativeProbability += probabilities[i];
-            if (choice <= cumulativeProbability) {
-                return cells[i];
+    selectCell(ant, cells, probabilities) {
+        const isProbabilityEquivalent = probabilities.length > 1 && probabilities.every(probability => probability === probabilities[0]);
+        if (isProbabilityEquivalent) {
+            for (let cell of cells) {
+                const history = ant.getHistory();
+                for (let i = history.length - 1; i >= 0; i--) {
+                    if (history[i] === cell) {
+                        probabilities[cells.indexOf(cell)] *= 0.5;
+                    }
+                }
             }
         }
-        return cells[cells.length - 1];
+
+        const maxProbability = Math.max(...probabilities);
+        const potentialCells = [];
+        for (let i = 0; i < probabilities.length; i++) {
+            if (probabilities[i] === maxProbability) {
+                potentialCells.push(cells[i]);
+            }
+        }
+        console.log(probabilities)
+        console.log("Cells", cells)
+        console.log("potentialCells", potentialCells);
+        console.log("maxProbability", maxProbability);
+
+        const finalCell = potentialCells[Math.floor(Math.random() * potentialCells.length)];
+        if (!finalCell) {
+            return cells[0];
+        }
+        return finalCell
+
     }
 
     backToStartCell(ant) {
-        const cell = ant.history[ant.history.length - 1];
+        const cell = ant.getHistory().pop();
         if (!cell) return;
-        ant.history.pop();
         this.ants.set(ant, cell);
 
         if (!(cell instanceof Start)) {
             cell.pheromone += 1;
         } else {
-            ant.isBackToStartCell = false;
+            ant.setBackToStartCell(false);
         }
     }
-
-    getAntsMap() {
-        return this.ants;
-    }
-
 }
