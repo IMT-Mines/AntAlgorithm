@@ -1,7 +1,8 @@
 class AntsManager {
 
-    constructor() {
+    constructor(grid) {
         this.ants = new Map();
+        this.grid = grid;
     }
 
     initAnts(cell, antNumber) {

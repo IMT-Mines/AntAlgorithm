@@ -1,14 +1,14 @@
 class Model {
 
-    SIZE = 11;
-    ANTS_COUNT = 1;
+    SIZE = 31;
+    ANTS_COUNT = 3;
     PHEROMONE_EVAPORATION_RATE = 0.995;
 
     constructor() {
         this.clock = new Clock(this.tick.bind(this));
         this.time = new Time();
-        this.antsManager = new AntsManager();
-        this.grid = new Grid(this.SIZE);
+        this.grid = new Grid(this.SIZE, 1);
+        this.antsManager = new AntsManager(this.grid);
         this.antsManager.initAnts(this.grid.startCell, this.ANTS_COUNT);
     }
 

@@ -1,13 +1,12 @@
 class Grid {
 
-    constructor(cellNumber, antsManager) {
-        this.antsManager = antsManager;
+    constructor(cellNumber, foodNumber = 4, additionalObstaclesRatio = 0.2) {
         this.cells = [];
-        this.initCells(cellNumber);
+        this.initCells(cellNumber, foodNumber, additionalObstaclesRatio);
     }
 
 
-    initCells(cellNumber, foodNumber = 4, additionalObstaclesRatio = 0.2) {
+    initCells(cellNumber, foodNumber, additionalObstaclesRatio) {
         this.generateDefaultGrid(cellNumber)
         this.generateMaze(cellNumber, additionalObstaclesRatio);
         this.generateFood(cellNumber, foodNumber);
@@ -31,13 +30,13 @@ class Grid {
             const neighbours = this.getNeighbours(currentCell, false, 2).filter(neighbour => !neighbour.visited);
             if (neighbours.length > 0) {
                 const randomCell = neighbours[Math.floor(Math.random() * neighbours.length)];
-                const newCell = new Free(randomCell.x, randomCell.y);
+                const newCell = new Free(randomCell.row, randomCell.col);
                 newCell.visited = true;
-                this.setCell(newCell.x, newCell.y, newCell);
+                this.setCell(newCell.row, newCell.col, newCell);
                 stack.push(currentCell);
-                const vector = { x: (newCell.x - currentCell.x) / 2, y: (newCell.y - currentCell.y) / 2 };
-                const newBetweenCell = new Free(currentCell.x + vector.x, currentCell.y + vector.y);
-                this.setCell(newBetweenCell.x, newBetweenCell.y, newBetweenCell);
+                const vector = { x: (newCell.row - currentCell.row) / 2, y: (newCell.col - currentCell.col) / 2 };
+                const newBetweenCell = new Free(currentCell.row + vector.x, currentCell.col + vector.y);
+                this.setCell(newBetweenCell.row, newBetweenCell.col, newBetweenCell);
                 currentCell = newCell;
             } else {
                 currentCell = stack.pop();
@@ -58,7 +57,7 @@ class Grid {
     }
 
     generateFood(cellNumber, foodNumber) {
-        const maxIterations = 1000;
+        const maxIterations = 5000;
         for (let i = 0; i < foodNumber; i++) {
             let randomRow = Math.floor(Math.random() * (cellNumber - 2)) + 1;
             let randomCol = Math.floor(Math.random() * (cellNumber - 2)) + 1;
@@ -100,9 +99,9 @@ class Grid {
             { x:  0, y:  neighboursDistance }
         ];
         for (let coordinate of coordinates) {
-            if (cell.x + coordinate.x < 0 || cell.x + coordinate.x >= this.cells.length ||
-                cell.y + coordinate.y < 0 || cell.y + coordinate.y >= this.cells.length) continue;
-            const neighbour = this.getCell(cell.x + coordinate.x, cell.y + coordinate.y);
+            if (cell.row + coordinate.x < 0 || cell.row + coordinate.x >= this.cells.length ||
+                cell.col + coordinate.y < 0 || cell.col + coordinate.y >= this.cells.length) continue;
+            const neighbour = this.getCell(cell.row + coordinate.x, cell.col + coordinate.y);
             if (neighbour && (!checkIfFree || this.checkCellIsFree(neighbour)))
                 neighbours.push(neighbour);
         }
