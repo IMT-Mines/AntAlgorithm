@@ -1,10 +1,8 @@
 class AntsManager {
 
-    // map ant to cell
-
-
-    constructor() {
+    constructor(grid) {
         this.ants = new Map();
+        this.grid = grid;
     }
 
     initAnts(cell, antNumber) {
@@ -24,7 +22,6 @@ class AntsManager {
 
             if (!ant.isBackToStartCell) {
 
-
                 const currentCell = this.ants.get(ant);
                 const neighbours = grid.getNeighbours(currentCell);
 
@@ -32,7 +29,6 @@ class AntsManager {
 
                 for (let neighbour of neighbours) {
                     if (neighbour instanceof Start) continue;
-
                     sumDenominator += EXPLORATION_RATE + neighbour.pheromone ** ALPHA;
                 }
 
@@ -55,7 +51,8 @@ class AntsManager {
                 // Gestion du cas où la fourmi est de retour à la cellule de départ
                 if (chosenCell instanceof Food) {
                     ant.isBackToStartCell = true;
-
+                    const lastCell = ant.history[ant.history.length - 1];
+                    // this.grid.calculateShortedPath(lastCell, ant);
                 }
             } else {
                 this.backToStartCell(ant);

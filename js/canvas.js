@@ -19,17 +19,16 @@ class Canvas {
 
     drawCells(cells, cellWidth, cellHeight) {
         this.ctx.clearRect(0, 0, this.width, this.height);
-        for (let x = 0; x < cells.length; x++) {
-            for (let y = 0; y < cells[x].length; y++) {
-                this.ctx.fillStyle = cells[x][y].color;
-                this.ctx.fillRect(y * cellWidth, x * cellHeight, cellWidth, cellHeight);
-
+        for (let col = 0; col < cells.length; col++) {
+            for (let row = 0; row < cells[col].length; row++) {
+                this.ctx.fillStyle = cells[row][col].color;
+                this.ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
 
                 // Pheromone
-                if (cells[x][y] instanceof Free) {
-                    const color = Math.floor(cells[x][y].pheromone * 255);
+                if (cells[row][col] instanceof Free) {
+                    const color = Math.floor(cells[row][col].pheromone * 255);
                     this.ctx.fillStyle = color === 0 ? "white" : `rgb(${color}, 0, ${255 - color})`;
-                    this.ctx.fillRect(y * cellWidth, x * cellHeight, cellWidth, cellHeight);
+                    this.ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
                 }
             }
         }
@@ -42,8 +41,8 @@ class Canvas {
             // random between 0 and 1
             const randomNumberBetween0And1 = Math.random();
 
-            const x = cell.x + randomNumberBetween0And1 / 2
-            const y = cell.y + randomNumberBetween0And1 / 2
+            const x = cell.row + randomNumberBetween0And1 / 2
+            const y = cell.col + randomNumberBetween0And1 / 2
 
             this.ctx.fillRect(y * cellWidth, x * cellHeight, cellWidth * 0.6, cellHeight * 0.6);
         }

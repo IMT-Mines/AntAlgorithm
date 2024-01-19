@@ -1,8 +1,8 @@
 class Cell {
 
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
+    constructor(row, col) {
+        this.row = row;
+        this.col = col;
         this.color = "#FFFFFF";
         this.visited = false; // for maze generation
         this.pheromone = 0.0;
@@ -11,30 +11,30 @@ class Cell {
 
 class Obstacle extends Cell {
 
-    constructor(x, y) {
-        super(x, y);
+    constructor(row, col) {
+        super(row, col);
         this.color = "#000000";
     }
 }
 
 class Food extends Cell {
 
-    constructor(x, y) {
-        super(x, y);
+    constructor(row, col) {
+        super(row, col);
         this.color = "#ffd500";
     }
 }
 
 class Start extends Cell {
 
-    constructor(x, y) {
-        super(x, y);
+    constructor(row, col) {
+        super(row, col);
         this.color = "#00FF00";
     }
 }
 
 class Free extends Cell {
-    constructor(x, y) {
-        super(x, y);
+    constructor(row, col) {
+        super(row, col);
     }
 }
