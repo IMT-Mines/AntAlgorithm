@@ -1,8 +1,8 @@
 class Model {
 
     SIZE = 31;
-    ANTS_COUNT = 30;
-    PHEROMONE_EVAPORATION_RATE = 0.955;
+    ANTS_COUNT = 3;
+    PHEROMONE_EVAPORATION_RATE = 0.995;
 
     constructor() {
         this.clock = new Clock(this.tick.bind(this));

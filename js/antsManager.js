@@ -17,7 +17,7 @@ class AntsManager {
 
 
     moveAnts(grid) {
-        const EXPLORATION_RATE = 0.5;
+        const EXPLORATION_RATE = 0.2;
         const ALPHA = 1;
 
         for (let ant of this.ants.keys()) {
@@ -29,6 +29,7 @@ class AntsManager {
                 const neighbours = grid.getNeighbours(currentCell);
 
                 let sumDenominator = 0;
+
                 for (let neighbour of neighbours) {
                     if (neighbour instanceof Start) continue;
 
