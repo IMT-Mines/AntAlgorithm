@@ -13,7 +13,7 @@ class Obstacle extends Cell {
 
     constructor(row, col) {
         super(row, col);
-        this.color = "#000000";
+        this.color = "#111111";
     }
 }
 

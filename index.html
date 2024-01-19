@@ -20,8 +20,24 @@
     <div class="controls">
         <p id="chronometer">00:00</p>
         <div class="buttons">
+            <button id="backward"><</button>
             <button id="action">Start</button>
-            <button id="pheromones">Pheromones</button>
+            <button id="forward">></button>
+<!--            <button id="pheromones">Pheromones</button>-->
+        </div>
+        <div class="parameters">
+            <div class="parameter">
+                <label for="gridSize">Grid size</label>
+                <input type="number" id="gridSize" name="gridSize" min="5" max="101" value="11">
+            </div>
+            <div class="parameter">
+                <label for="food">Food</label>
+                <input type="number" id="food" name="food" min="1" max="100" value="1">
+            </div>
+            <div class="parameter">
+                <label for="ants">Ants</label>
+                <input type="number" id="ants" name="ants" min="1" max="100" value="1">
+            </div>
         </div>
     </div>
     <canvas id="canvas"></canvas>

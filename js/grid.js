@@ -2,14 +2,15 @@ class Grid {
 
     constructor(cellNumber, foodNumber = 4, additionalObstaclesRatio = 0.2) {
         this.cells = [];
-        this.initCells(cellNumber, foodNumber, additionalObstaclesRatio);
+        this.foodNumber = foodNumber;
+        this.initCells(cellNumber, additionalObstaclesRatio);
     }
 
 
-    initCells(cellNumber, foodNumber, additionalObstaclesRatio) {
+    initCells(cellNumber, additionalObstaclesRatio) {
         this.generateDefaultGrid(cellNumber)
         this.generateMaze(cellNumber, additionalObstaclesRatio);
-        this.generateFood(cellNumber, foodNumber);
+        this.generateFood(cellNumber);
         return this.generateStart(cellNumber);
     }
 
@@ -56,9 +57,9 @@ class Grid {
                     this.setCell(row, col, new Free(row, col));
     }
 
-    generateFood(cellNumber, foodNumber) {
+    generateFood(cellNumber) {
         const maxIterations = 5000;
-        for (let i = 0; i < foodNumber; i++) {
+        for (let i = 0; i < this.foodNumber; i++) {
             let randomRow = Math.floor(Math.random() * (cellNumber - 2)) + 1;
             let randomCol = Math.floor(Math.random() * (cellNumber - 2)) + 1;
             let currentIteration = 0;
@@ -167,6 +168,10 @@ class Grid {
             }
         }
 
+    }
+
+    getFoodNumber() {
+        return this.foodNumber;
     }
 
 }
