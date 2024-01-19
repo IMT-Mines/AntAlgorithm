@@ -17,7 +17,8 @@ class Model {
         this.antsManager = new AntsManager(this.grid);
         this.antsManager.initAnts(this.grid.startCell, this.ANTS_COUNT);
         this.history = [];
-        this.updateActionButtonText("Start");
+        if (this.updateActionButtonText)
+            this.updateActionButtonText("Start");
     }
 
     bindDisplayChronometer(callBack) {
