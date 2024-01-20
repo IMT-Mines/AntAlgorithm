@@ -1,4 +1,9 @@
 class Canvas {
+
+
+    SPEED = 2;
+
+
     constructor(ctx) {
         this.ctx = ctx;
         this.ctx.fillStyle = "white";
@@ -23,6 +28,13 @@ class Canvas {
             for (let row = 0; row < cells[col].length; row++) {
                 this.ctx.fillStyle = cells[row][col].color;
                 this.ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
+                if (cells[row][col] instanceof Food) {
+                    // if food quantity is 0, the cell is not displayed
+                    if (cells[row][col].foodQuantity === 0) {
+                        this.ctx.fillStyle = "orange";
+                        this.ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
+                    }
+                }
 
                 // Pheromone
                 if (cells[row][col] instanceof Free) {
@@ -47,5 +59,4 @@ class Canvas {
             this.ctx.fillRect(y * cellWidth, x * cellHeight, cellWidth * 0.6, cellHeight * 0.6);
         }
     }
-
 }

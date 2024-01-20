@@ -1,8 +1,10 @@
 class Ant {
 
-    transportCapacity = 10;
+    transport = 0;
     history = [];
     backToStartCell = false;
+    x = 0;
+    y = 0;
 
     constructor() {
         this.color = "#" + Math.floor(Math.random() * 16777215).toString(16);

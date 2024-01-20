@@ -1,13 +1,14 @@
 class AntsManager {
 
-    constructor(grid) {
+    constructor() {
         this.ants = new Map();
-        this.grid = grid;
     }
 
     initAnts(cell, antNumber) {
         for (let i = 0; i < antNumber; i++) {
             const ant = new Ant();
+            ant.x = cell.col;
+            ant.y = cell.row;
             ant.getHistory().push(cell)
             this.ants.set(ant, cell);
         }
@@ -15,11 +16,10 @@ class AntsManager {
 
 
     moveAnts(grid) {
-        const EXPLORATION_RATE = 0.2;
-        const ALPHA = 1;
+        const EXPLORATION_RATE = 2;
+        const ALPHA = 2;
 
         for (let ant of this.ants.keys()) {
-
             if (!ant.isBackToStartCell()) {
                 const currentCell = this.ants.get(ant);
                 const neighbours = grid.getNeighbours(currentCell);
@@ -28,15 +28,10 @@ class AntsManager {
                 let sumDenominator = 0;
 
                 for (let neighbour of neighbours) {
-                    if (neighbour instanceof Start) continue;
                     sumDenominator += EXPLORATION_RATE + neighbour.pheromone ** ALPHA;
                 }
 
                 for (let neighbour of neighbours) {
-                    if (neighbour instanceof Start) {
-                        probability.push(0);
-                    }
-
                     const numerator = EXPLORATION_RATE + neighbour.pheromone ** ALPHA;
                     const result = numerator / sumDenominator;
 
@@ -48,9 +43,11 @@ class AntsManager {
                 this.ants.set(ant, chosenCell);
                 ant.getHistory().push(chosenCell);
 
-                if (chosenCell instanceof Food) {
+                if (chosenCell instanceof Food && chosenCell.foodQuantity > 0) {
+                    ant.transport += 10;
+                    grid.getCell(chosenCell.row, chosenCell.col).foodQuantity -= 10;
                     ant.setBackToStartCell(true);
-                    this.grid.getShortestPath(chosenCell, ant);
+                    grid.getShortestPath(chosenCell, ant);
                 }
             } else {
                 this.backToStartCell(ant);
@@ -59,14 +56,14 @@ class AntsManager {
     }
 
     selectCell(ant, cells, probabilities) {
-        const isProbabilityEquivalent = probabilities.length > 1 && probabilities.every(probability => probability === probabilities[0]);
-        if (isProbabilityEquivalent) {
-            for (let cell of cells) {
-                const history = ant.getHistory();
-                for (let i = history.length - 1; i >= 0; i--) {
-                    if (history[i] === cell) {
-                        probabilities[cells.indexOf(cell)] *= 0.5;
-                    }
+        const ALREADY_VISITED_MALUS = 0.2;
+
+
+        for (let cell of cells) {
+            const history = ant.getHistory();
+            for (let i = history.length - 1; i >= 0; i--) {
+                if (history[i] === cell) {
+                    probabilities[cells.indexOf(cell)] *= ALREADY_VISITED_MALUS;
                 }
             }
         }
@@ -93,9 +90,29 @@ class AntsManager {
         this.ants.set(ant, cell);
 
         if (!(cell instanceof Start)) {
+            // TODO Adapt quantity with length of path
             cell.pheromone += 1;
+            cell.total += 1;
         } else {
+            ant.getHistory().push(cell);
+            ant.transport = 0;
+            cell.foodQuantity += 10;
             ant.setBackToStartCell(false);
         }
+    }
+
+    clone() {
+        const clone = new AntsManager();
+        for (let ant of this.ants.keys()) {
+            const clonedAnt = new Ant();
+            const clonedHistory = [];
+            for (let cell of ant.getHistory()) {
+                clonedHistory.push(cell); // Todo maybe clone cell
+            }
+            clonedAnt.setHistory(clonedHistory);
+            clonedAnt.setBackToStartCell(ant.isBackToStartCell());
+            clone.ants.set(clonedAnt, this.ants.get(ant));
+        }
+        return clone;
     }
 }
