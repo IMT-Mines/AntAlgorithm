@@ -1,10 +1,12 @@
 class Model {
 
     SIZE = 11;
-    FOOD_COUNT = 1;
+    FOOD_COUNT = 2;
     ANTS_COUNT = 1;
-    PHEROMONE_EVAPORATION_RATE = 0.995;
-    MAX_HISTORY_LENGTH = 10;
+    PHEROMONE_EVAPORATION_RATE = 0.985;
+    MAX_HISTORY_LENGTH = 100;
+
+    timeCount = 0;
 
     constructor() {
         this.init();
@@ -14,7 +16,7 @@ class Model {
         this.clock = new Clock(this.tick.bind(this));
         this.time = new Time();
         this.grid = new Grid(this.SIZE, this.FOOD_COUNT);
-        this.antsManager = new AntsManager(this.grid);
+        this.antsManager = new AntsManager();
         this.antsManager.initAnts(this.grid.startCell, this.ANTS_COUNT);
         this.history = [];
         if (this.updateActionButtonText)
@@ -52,18 +54,25 @@ class Model {
     }
 
     tick(deltaTime) {
-        // this.updateChronometer(this.clock.actualFps);
+
+        this.timeCount += deltaTime;
+        if (this.timeCount > 1000) {
+            this.timeCount = 0;
+
+            this.antsManager.moveAnts(this.grid);
+            this.grid.updatePheromones(this.PHEROMONE_EVAPORATION_RATE);
+
+            this.history.push({
+                antsManager: this.antsManager.clone(),
+                grid: this.grid.clone(),
+            });
+            if (this.history.length > this.MAX_HISTORY_LENGTH)
+                this.history.shift();
+        }
+
         this.updateChronometer(this.time.getFormattedElapsedTime());
 
-        // apply rules for ants
-        this.antsManager.moveAnts(this.grid);
-        this.grid.updatePheromones(this.PHEROMONE_EVAPORATION_RATE);
-
         this.displayCanvasCells(this.grid.getCells(), this.antsManager.ants);
-
-        this.history.push({grid: this.grid, antManager: this.antsManager, time: this.time});
-        if (this.history.length > this.MAX_HISTORY_LENGTH)
-            this.history.shift();
     }
 
     updateCanvasCells(cells, ants) {
@@ -74,8 +83,8 @@ class Model {
         if (this.history.length > 1) {
             const last = this.history.pop();
             this.grid = last.grid;
-            this.antsManager = last.antManager;
-            this.time = last.time;
+            this.antsManager = last.antsManager;
+            // this.time = last.time;
             this.updateChronometer(this.time.getFormattedElapsedTime());
             this.displayCanvasCells(this.grid.getCells(), this.antsManager.ants);
         }
@@ -143,12 +152,12 @@ class View {
         this.chronometer = document.getElementById("chronometer");
         this.canvas = new Canvas(document.getElementById('canvas').getContext('2d'));
 
-        this.backwardButton = document.getElementById('backward');
+        this.backwardButton = document.getElementById('previous');
         this.backwardButton.addEventListener('click', () => {
             this.bindBackwardButton();
         });
 
-        this.forwardButton = document.getElementById('forward');
+        this.forwardButton = document.getElementById('next');
         this.forwardButton.addEventListener('click', () => {
             this.bindForwardButton();
         });
@@ -172,6 +181,17 @@ class View {
         this.ants.addEventListener('change', () => {
             this.bindChangeAnts();
         });
+
+
+        const antImage = new Image();
+        antImage.src = "assets/tiles/ant.png";
+        Promise.all([
+            new Promise(resolve => antImage.onload = resolve),
+        ]).then(() => {
+            console.log("Images loaded")
+            this.canvas.antImage = antImage;
+        });
+
     }
 
     displayChronometer(value) {
@@ -238,7 +258,7 @@ class Controller {
         this.view.displayCanvasCells(cells, ants);
     }
 
-    bindActionButton () {
+    bindActionButton() {
         this.model.bindActionButton();
     }
 

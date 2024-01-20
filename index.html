@@ -15,32 +15,56 @@
     <script src="js/app.js" defer></script>
 </head>
 <body>
+<div class="controls">
+    <p id="chronometer">00:00</p>
+    <div class="time-buttons">
+        <div class="button left" id="previous">
+            <svg viewBox="419.6 118 12 12.1" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                <path d="M431.6 129.1a1 1 0 0 1-1.6.8l-7.1-5a1 1 0 0 1 0-1.6l7.1-5a1 1 0 0 1 1.6.7v10.1Zm-12 .2a.8.8 0 0 0 1.5 0v-10.5a.8.8 0 0 0-1.5 0v10.5Z"/>
+            </svg>
+            Prev
+        </div>
+        <div class="button middle" id="action">
+            <svg viewBox="384 227.5 11.1 12.5" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                <path d="M384 239v-10.6c.2-.7 1-1.1 1.5-.7l9 5.2a1 1 0 0 1 0 1.8l-9 5.2a1 1 0 0 1-1.5-.8v-.1Z"/>
+            </svg>
+            Start
+        </div>
+        <div class="button right" id="next">
+            <svg viewBox="448.9 117 12 12.1" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                <path d="M448.9 118a1 1 0 0 1 1.6-.8l7 5a1 1 0 0 1 0 1.7l-7 5a1 1 0 0 1-1.6-.8v-10Zm12-.2a.8.8 0 0 0-1.5 0v10.5a.7.7 0 1 0 1.5 0v-10.5Z"/>
+            </svg>
+            Next
+        </div>
+    </div>
+    <div class="time-buttons">
+        <div class="button left active">Slow</div>
+        <div class="button middle">Normal</div>
+        <div class="button right">Fast</div>
+    </div>
+</div>
 
 <div class="app">
-    <div class="controls">
-        <p id="chronometer">00:00</p>
-        <div class="buttons">
-            <button id="backward"><</button>
-            <button id="action">Start</button>
-            <button id="forward">></button>
-<!--            <button id="pheromones">Pheromones</button>-->
-        </div>
+    <canvas class="container" id="canvas"></canvas>
+
+    <div class="container">
+        <p>Paramètres :</p>
         <div class="parameters">
             <div class="parameter">
                 <label for="gridSize">Grid size</label>
-                <input type="number" id="gridSize" name="gridSize" min="5" max="101" value="11">
+                <input type="number" id="gridSize" name="gridSize" min="5" max="101" value="51">
             </div>
             <div class="parameter">
                 <label for="food">Food</label>
-                <input type="number" id="food" name="food" min="1" max="100" value="1">
+                <input type="number" id="food" name="food" min="1" max="100" value="5">
             </div>
             <div class="parameter">
                 <label for="ants">Ants</label>
-                <input type="number" id="ants" name="ants" min="1" max="100" value="1">
+                <input type="number" id="ants" name="ants" min="1" max="100" value="50">
             </div>
         </div>
     </div>
-    <canvas id="canvas"></canvas>
+
 </div>
 
 </body>

@@ -1,7 +1,7 @@
 class Clock {
 
     constructor(callBack) {
-        this.fps = 30;
+        this.fps = 60;
         this.lastTime = null;
         this.deltaTime = 0;
         this.frameDuration = 1000 / this.fps;
