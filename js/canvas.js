@@ -1,9 +1,4 @@
 class Canvas {
-
-
-    SPEED = 2;
-
-
     constructor(ctx) {
         this.ctx = ctx;
         this.ctx.fillStyle = "white";
@@ -59,4 +54,5 @@ class Canvas {
             this.ctx.fillRect(y * cellWidth, x * cellHeight, cellWidth * 0.6, cellHeight * 0.6);
         }
     }
+
 }
