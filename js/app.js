@@ -2,7 +2,7 @@ class Model {
 
     SIZE = 11;
     FOOD_COUNT = 2;
-    ANTS_COUNT = 1;
+    ANTS_COUNT = 2;
     PHEROMONE_EVAPORATION_RATE = 0.985;
     MAX_HISTORY_LENGTH = 100;
 
@@ -54,7 +54,6 @@ class Model {
     }
 
     tick(deltaTime) {
-
         this.timeCount += deltaTime;
         if (this.timeCount > 1000) {
             this.timeCount = 0;
@@ -70,9 +69,8 @@ class Model {
                 this.history.shift();
         }
 
+        this.displayCanvasCells(this.grid.getCells(), this.antsManager.ants, deltaTime);
         this.updateChronometer(this.time.getFormattedElapsedTime());
-
-        this.displayCanvasCells(this.grid.getCells(), this.antsManager.ants);
     }
 
     updateCanvasCells(cells, ants) {
@@ -150,7 +148,6 @@ class View {
 
     initView() {
         this.chronometer = document.getElementById("chronometer");
-        this.canvas = new Canvas(document.getElementById('canvas').getContext('2d'));
 
         this.backwardButton = document.getElementById('previous');
         this.backwardButton.addEventListener('click', () => {
@@ -189,7 +186,7 @@ class View {
             new Promise(resolve => antImage.onload = resolve),
         ]).then(() => {
             console.log("Images loaded")
-            this.canvas.antImage = antImage;
+            this.canvas = new Canvas(document.getElementById('canvas').getContext('2d'), antImage);
         });
 
     }
@@ -198,8 +195,8 @@ class View {
         this.chronometer.innerHTML = value;
     }
 
-    displayCanvasCells(cells, ants) {
-        this.canvas.draw(cells, ants);
+    displayCanvasCells(cells, ants, deltaTime) {
+        this.canvas.draw(cells, ants, deltaTime);
     }
 
     updateActionButtonText(text) {
@@ -254,8 +251,8 @@ class Controller {
         this.view.displayChronometer(value);
     }
 
-    bindDisplayCanvasCells(cells, ants) {
-        this.view.displayCanvasCells(cells, ants);
+    bindDisplayCanvasCells(cells, ants, deltaTime) {
+        this.view.displayCanvasCells(cells, ants, deltaTime);
     }
 
     bindActionButton() {

@@ -2,6 +2,8 @@
     margin: 0;
     padding: 0;
     font-family: system-ui;
+    --main-color: #6433e1;
+    --main-color-light: #a9a1ff;
 }
 
 canvas {
@@ -9,22 +11,6 @@ canvas {
     width: 80vh;
     height: 80vh;
 }
-
-
-/*.buttons {*/
-/*    display: flex;*/
-/*    flex-direction: row;*/
-/*    gap: 1rem;*/
-/*}*/
-
-/*.parameter {*/
-/*    display: flex;*/
-/*    flex-direction: row;*/
-/*    align-items: center;*/
-/*    gap: 1rem;*/
-/*    justify-content: space-between;*/
-/*}*/
-
 
 .app {
     display: flex;
@@ -44,35 +30,38 @@ canvas {
 
 #chronometer {
     font-size: 2rem;
-    color: #0d6efd;
+    color: var(--main-color);
 }
+
 .time-buttons {
     display: flex;
-
-    .left {
-        border-radius: 0.2rem 0 0 0.2rem;
-    }
-    .right {
-        border-radius: 0 0.2rem 0.2rem 0;
-    }
-    .middle {
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-    }
 }
 
 .button {
     border-radius: 0.2rem;
     padding: 0.25rem 0.5rem;
-    border: #0d6efd 1px solid;
-    color: #0d6efd;
+    border: var(--main-color) 1px solid;
+    color: var(--main-color);
     cursor: pointer;
     transition: 0.2s;
-    fill: #0d6efd;
+    fill: var(--main-color);
     display: flex;
     align-items: center;
     gap: 5px;
+}
+
+.left {
+    border-radius: 0.2rem 0 0 0.2rem !important;
+    border-right: none !important;
+}
+
+.right {
+    border-radius: 0 0.2rem 0.2rem 0 !important;
+    border-left: none !important;
+}
+
+.middle {
+    border-radius: 0 !important;
 }
 
 .container {
@@ -93,17 +82,53 @@ input {
     gap: 5px;
 }
 
-
-.button:hover {
-    background: #0d6efd;
+.button:hover:not(:disabled) {
+    background: var(--main-color);
     fill: white;
     color: white;
     transition: 0.2s;
 }
 
-.button.active {
-    background: #0d6efd;
-    fill: white;
+.button:disabled {
+    fill: var(--main-color-light);
+    color: var(--main-color-light);
+    border: var(--main-color-light) 1px solid;
+    cursor: default;
+}
+
+
+/* ===================================== */
+/* =========== TOGGLE BUTTON =========== */
+/* ===================================== */
+
+.toggle {
+    display: flex;
+}
+
+.toggle input[type="radio"] {
+    display: none;
+}
+
+input[type="radio"]:checked + label {
+    background: var(--main-color);
+    color: white;
+    transition: 0.2s;
+}
+
+label.toggle-option {
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 0.2rem;
+    border: var(--main-color) 1px solid;
+    color: var(--main-color);
+}
+
+label.toggle-option:hover {
+    background: var(--main-color);
     color: white;
     transition: 0.2s;
 }

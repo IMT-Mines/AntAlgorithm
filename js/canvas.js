@@ -1,5 +1,5 @@
 class Canvas {
-    constructor(ctx) {
+    constructor(ctx, antImage) {
         this.ctx = ctx;
         this.ctx.fillStyle = "white";
         this.width = this.ctx.canvas.width;
@@ -8,13 +8,14 @@ class Canvas {
         this.ctx.canvas.width *= devicePixelRatio;
         this.ctx.canvas.height *= devicePixelRatio;
         this.ctx.scale(devicePixelRatio, devicePixelRatio);
+        this.antImage = antImage;
     }
 
-    draw(cells, antsMap) {
+    draw(cells, antsMap, deltaTime) {
         const cellWidth = this.width / cells[0].length;
         const cellHeight = this.height / cells.length;
         this.drawCells(cells, cellWidth, cellHeight);
-        this.drawAnts(antsMap, cellWidth, cellHeight);
+        this.drawAnts(antsMap, cellWidth, cellHeight, deltaTime);
     }
 
     drawCells(cells, cellWidth, cellHeight) {
@@ -41,18 +42,29 @@ class Canvas {
         }
     }
 
-    drawAnts(antsMap, cellWidth, cellHeight) {
+    drawAnts(antsMap, cellWidth, cellHeight, deltaTime) {
+        const speed = 1; // ajustez la valeur selon vos besoins
         for (let ant of antsMap.keys()) {
-            this.ctx.fillStyle = ant.getColor();
             const cell = antsMap.get(ant);
-            // random between 0 and 1
-            const randomNumberBetween0And1 = Math.random();
 
-            const x = cell.row + randomNumberBetween0And1 / 2
-            const y = cell.col + randomNumberBetween0And1 / 2
+            let initX = ant.x;
+            let initY = ant.y;
+            let destX = cell.col;
+            let destY = cell.row;
 
-            this.ctx.fillRect(y * cellWidth, x * cellHeight, cellWidth * 0.6, cellHeight * 0.6);
+            let xDiff = destX - initX;
+            let yDiff = destY - initY;
+
+            let normalizedDeltaTime = deltaTime / 1000;
+            let deltaX = speed * xDiff * normalizedDeltaTime;
+            let deltaY = speed * yDiff * normalizedDeltaTime;
+
+            let rotation = Math.atan2(yDiff, xDiff); // Inverser la direction de rotation
+
+            ant.x += deltaX;
+            ant.y += deltaY;
+
+            this.ctx.drawImage(this.antImage, ant.x * cellWidth, ant.y * cellHeight, cellWidth, cellHeight);
         }
     }
-
 }
