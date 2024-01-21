@@ -6,8 +6,8 @@ class Clock {
         this.deltaTime = 0;
         this.frameDuration = 1000 / this.fps;
         this.callBack = callBack;
-        this.actualFps = 0;
         this.running = false;
+        this.actualFps = 0;
     }
 
     start() {

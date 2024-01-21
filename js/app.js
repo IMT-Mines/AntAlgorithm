@@ -1,9 +1,9 @@
 class Model {
 
-    SIZE = 11;
-    FOOD_COUNT = 2;
-    ANTS_COUNT = 2;
-    PHEROMONE_EVAPORATION_RATE = 0.985;
+    SIZE = 51;
+    FOOD_COUNT = 5;
+    ANTS_COUNT = 50;
+    PHEROMONE_EVAPORATION_RATE = 0.996;
     MAX_HISTORY_LENGTH = 100;
 
     timeCount = 0;

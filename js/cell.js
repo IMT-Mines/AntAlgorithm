@@ -6,7 +6,18 @@ class Cell {
         this.color = "#FFFFFF";
         this.visited = false; // for maze generation
         this.pheromone = 0.0;
-        this.total = 0.0;
+    }
+
+    addPheromone(quantity) {
+        this.pheromone += quantity;
+    }
+
+    getPheromone() {
+        return this.pheromone;
+    }
+
+    multiplyPheromone(rate) {
+        this.pheromone *= rate;
     }
 }
 
@@ -23,7 +34,15 @@ class Food extends Cell {
     constructor(row, col) {
         super(row, col);
         this.color = "#ffd500";
-        this.foodQuantity = 2000;
+        this.foodQuantity = 10;
+    }
+
+    addFoodQuantity(quantity) {
+        this.foodQuantity += quantity;
+    }
+
+    getFoodQuantity() {
+        return this.foodQuantity;
     }
 }
 
@@ -33,6 +52,10 @@ class Start extends Cell {
         super(row, col);
         this.color = "#00FF00";
         this.foodQuantity = 0;
+    }
+
+    addFoodQuantity(quantity) {
+        this.foodQuantity += quantity;
     }
 }
 

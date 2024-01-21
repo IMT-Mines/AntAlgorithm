@@ -21,11 +21,7 @@ class Time {
     }
 
     getElapsedTime() {
-        if (this.paused) {
-            return this.pausedTime - this.startTime;
-        } else {
-            return new Date() - this.startTime;
-        }
+        return this.paused ? this.pausedTime - this.startTime : new Date() - this.startTime;
     }
 
     getFormattedElapsedTime() {
@@ -34,5 +30,4 @@ class Time {
         const seconds = Math.floor((elapsedTime - minutes * 60000) / 1000);
         return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
-
 }

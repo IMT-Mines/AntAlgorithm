@@ -25,16 +25,15 @@ class Canvas {
                 this.ctx.fillStyle = cells[row][col].color;
                 this.ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
                 if (cells[row][col] instanceof Food) {
-                    // if food quantity is 0, the cell is not displayed
-                    if (cells[row][col].foodQuantity === 0) {
+                    if (cells[row][col].getFoodQuantity() === 0) {
                         this.ctx.fillStyle = "orange";
                         this.ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
                     }
                 }
 
-                // Pheromone
+                // Pheromone drawing
                 if (cells[row][col] instanceof Free) {
-                    const color = Math.floor(cells[row][col].pheromone * 255);
+                    const color = Math.floor(cells[row][col].getPheromone() * 255);
                     this.ctx.fillStyle = color === 0 ? "white" : `rgb(${color}, 0, ${255 - color})`;
                     this.ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
                 }
@@ -43,7 +42,7 @@ class Canvas {
     }
 
     drawAnts(antsMap, cellWidth, cellHeight, deltaTime) {
-        const speed = 1; // ajustez la valeur selon vos besoins
+        const speed = 1;
         for (let ant of antsMap.keys()) {
             const cell = antsMap.get(ant);
 
@@ -59,7 +58,7 @@ class Canvas {
             let deltaX = speed * xDiff * normalizedDeltaTime;
             let deltaY = speed * yDiff * normalizedDeltaTime;
 
-            let rotation = Math.atan2(yDiff, xDiff); // Inverser la direction de rotation
+            let rotation = Math.atan2(yDiff, xDiff);
 
             ant.x += deltaX;
             ant.y += deltaY;

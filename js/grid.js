@@ -1,6 +1,6 @@
 class Grid {
 
-    constructor(cellNumber, foodNumber = 4, additionalObstaclesRatio = 0.2) {
+    constructor(cellNumber, foodNumber, additionalObstaclesRatio = 0.2) {
         this.cells = [];
         this.foodNumber = foodNumber;
         this.initCells(cellNumber, additionalObstaclesRatio);
@@ -163,15 +163,10 @@ class Grid {
         for (let row = 0; row < this.cells.length; row++) {
             for (let col = 0; col < this.cells[row].length; col++) {
                 if (this.cells[row][col] instanceof Free) {
-                    this.cells[row][col].pheromone *= rate;
+                    this.cells[row][col].multiplyPheromone(rate);
                 }
             }
         }
-
-    }
-
-    getFoodNumber() {
-        return this.foodNumber;
     }
 
     clone() {
@@ -194,5 +189,4 @@ class Grid {
         }
         return grid;
     }
-
 }
