@@ -32,19 +32,19 @@ class Model {
     bindChangeGridSize(newSize) {
         Options.SIZE = newSize;
         this.init();
-        this.updateCanvasCells(this.grid.getCells(), this.antsManager.ants);
+        this.updateCanvasCells(this.grid, this.antsManager.ants);
     }
 
     bindChangeFood(newFood) {
         Options.FOOD_COUNT = newFood;
         this.init();
-        this.updateCanvasCells(this.grid.getCells(), this.antsManager.ants);
+        this.updateCanvasCells(this.grid, this.antsManager.ants);
     }
 
     bindChangeAnts(newAnts) {
         this.ANTS_COUNT = newAnts;
         this.init();
-        this.updateCanvasCells(this.grid.getCells(), this.antsManager.ants);
+        this.updateCanvasCells(this.grid, this.antsManager.ants);
     }
 
     tick(deltaTime) {
@@ -57,7 +57,7 @@ class Model {
             this.timeAccumulator -= 1 / Options.CELL_PER_SECOND;
         }
 
-        this.displayCanvasCells(this.grid.getCells(), this.antsManager.ants, deltaTime);
+        this.displayCanvasCells(this.grid, this.antsManager.ants, deltaTime);
         this.updateChronometer(this.time.getFormattedElapsedTime());
     }
 
@@ -71,7 +71,7 @@ class Model {
     }
 
     updateCanvasCells(cells, ants) {
-        this.displayCanvasCells(cells, ants, 0);
+        this.displayCanvasCells(this.grid, ants, 0);
     }
 
     bindBackwardButton() {
@@ -201,8 +201,8 @@ class View {
         this.chronometer.innerHTML = value;
     }
 
-    displayCanvasCells(cells, ants, deltaTime) {
-        this.canvas.draw(cells, ants, deltaTime);
+    displayCanvasCells(grid, ants, deltaTime) {
+        this.canvas.draw(grid, ants, deltaTime);
     }
 
     updateActionButtonText(text) {
@@ -226,7 +226,9 @@ class Controller {
         this.model.bindDisplayCanvasCells(this.bindDisplayCanvasCells.bind(this));
         this.model.bindUpdateActionButtonText(this.bindUpdateActionButtonText.bind(this));
 
-        this.model.updateCanvasCells(this.model.grid.cells, [], 0);
+        this.view.canvas.loadAssets().then(() => {
+            this.model.updateCanvasCells(this.model.grid, [], 0);
+        });
     }
 
     bindChangeGridSize() {
@@ -257,8 +259,8 @@ class Controller {
         this.view.displayChronometer(value);
     }
 
-    bindDisplayCanvasCells(cells, ants, deltaTime) {
-        this.view.displayCanvasCells(cells, ants, deltaTime);
+    bindDisplayCanvasCells(grid, ants, deltaTime) {
+        this.view.displayCanvasCells(grid, ants, deltaTime);
     }
 
     bindActionButton() {
@@ -269,7 +271,7 @@ class Controller {
 
 class Options {
 
-    static SIZE = 21;
+    static SIZE = 29;
     static FOOD_COUNT = 5;
     static ANTS_COUNT = 5;
     static PHEROMONE_EVAPORATION_RATE = 0.996;
@@ -278,7 +280,7 @@ class Options {
 
 }
 
-// TODO: REMOVE IT (FOR TESTS ONLY)
+// TODO: REMOVE IT (FOR TESTS ONLY or not?)
 RandomNumberGenerator.setSeed(10);
 
 const app = new Controller(new Model(), new View());

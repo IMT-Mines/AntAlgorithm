@@ -133,13 +133,14 @@ class Grid {
         return path.reverse();
     }
 
+    // Neighbours are checked in the following order: top, right, bottom, left
     getNeighbours(cell, checkIfFree = true, neighboursDistance = 1) {
         const neighbours = [];
         const coordinates = [
             { x: -1 * neighboursDistance, y:  0 },
+            { x:  0, y:  neighboursDistance },
             { x:  neighboursDistance, y:  0},
-            { x:  0, y: -1 * neighboursDistance },
-            { x:  0, y:  neighboursDistance }
+            { x:  0, y: -1 * neighboursDistance }
         ];
         for (let coordinate of coordinates) {
             if (cell.row + coordinate.x < 0 || cell.row + coordinate.x >= this.cells.length ||
