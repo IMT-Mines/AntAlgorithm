@@ -125,6 +125,7 @@ label.toggle-option {
     border-radius: 0.2rem;
     border: var(--main-color) 1px solid;
     color: var(--main-color);
+    font-size: 13px;
 }
 
 label.toggle-option:hover {
