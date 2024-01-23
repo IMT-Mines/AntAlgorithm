@@ -133,7 +133,7 @@ class Canvas {
 
                 if (cell instanceof Food) {
                     this.ctx.fillStyle = cell.color;
-                    if (cell.getFoodQuantity() === 0)
+                    if (cell.getFoodQuantity() < 0)
                         this.ctx.fillStyle = "orange";
                 } else if (cell instanceof Free) {
                     const pheromone = cell.getPheromone();

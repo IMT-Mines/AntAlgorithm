@@ -1,8 +1,9 @@
 class AntsManager {
 
-    ALREADY_VISITED_MALUS = 0.2;
-    EXPLORATION_RATE = 2;
-    ALPHA = 2;
+    ALREADY_VISITED_MALUS = 0.1;
+    EXPLORATION_RATE = 0.1;
+    ALPHA = 1;
+    DROP_PARAMETER = 0.5;
 
     constructor() {
         this.ants = new Map();
@@ -46,9 +47,10 @@ class AntsManager {
 
             if (chosenCell instanceof Food && chosenCell.getFoodQuantity() > 0) {
                 ant.setTransport(0.1);
-                grid.getCell(chosenCell.row, chosenCell.col).addFoodQuantity(0.1);
+                grid.getCell(chosenCell.row, chosenCell.col).addFoodQuantity(-0.1);
                 ant.setBackToStartCell(true);
                 grid.getShortestPath(chosenCell, ant);
+                ant.pathLength = ant.getHistory().length;
                 this.backToStartCell(ant)
             }
         }
@@ -81,11 +83,7 @@ class AntsManager {
             }
         }
 
-        const finalCell = potentialCells[Math.floor(RandomNumberGenerator.next() * potentialCells.length)];
-        if (!finalCell) {
-            return cells[0];
-        }
-        return finalCell;
+        return potentialCells[Math.floor(Math.random() * potentialCells.length)];
     }
 
     /**
@@ -103,10 +101,16 @@ class AntsManager {
             ant.getHistory().push(cell);
             ant.setTransport(0);
             cell.addFoodQuantity(ant.getTransport());
+            ant.pathLength = 0;
             ant.setBackToStartCell(false);
         } else {
-            cell.addPheromone(0.1);
+            this.dropPheromone(ant, cell);
         }
+    }
+
+
+    dropPheromone(ant, cell) {
+        cell.addPheromone(this.DROP_PARAMETER / ant.pathLength);
     }
 
     clone() {
