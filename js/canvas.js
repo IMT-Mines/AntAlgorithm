@@ -52,7 +52,7 @@ class Canvas {
                 // Food drawing
                 if (cell instanceof Food) {
                     this.ctx.fillStyle = cell.color;
-                    if (cell.getFoodQuantity() === 0)
+                    if (cell.getFoodQuantity() < 0)
                         this.ctx.fillStyle = "orange";
                 }
 

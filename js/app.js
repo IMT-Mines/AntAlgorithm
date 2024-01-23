@@ -272,13 +272,13 @@ class Options {
     static SIZE = 21;
     static FOOD_COUNT = 5;
     static ANTS_COUNT = 5;
-    static PHEROMONE_EVAPORATION_RATE = 0.996;
+    static PHEROMONE_EVAPORATION_RATE = 0.99;
     static MAX_HISTORY_LENGTH = 100;
     static CELL_PER_SECOND = 6;
 
 }
 
 // TODO: REMOVE IT (FOR TESTS ONLY)
-RandomNumberGenerator.setSeed(10);
+RandomNumberGenerator.setSeed(17);
 
 const app = new Controller(new Model(), new View());

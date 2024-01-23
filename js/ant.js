@@ -2,6 +2,7 @@ class Ant {
 
     transport = 0;
     history = [];
+    pathLength = 0;
     backToStartCell = false;
     x = 0;
     y = 0;
