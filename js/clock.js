@@ -33,4 +33,8 @@ class Clock {
             requestAnimationFrame(this.run.bind(this));
         }
     }
+
+    isRunning() {
+        return this.running;
+    }
 }

@@ -30,4 +30,13 @@ class Time {
         const seconds = Math.floor((elapsedTime - minutes * 60000) / 1000);
         return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
+
+    hasBeenStarted() {
+        return this.startTime !== null;
+    }
+
+    isPaused() {
+        return this.paused;
+    }
+
 }

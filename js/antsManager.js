@@ -81,7 +81,7 @@ class AntsManager {
             }
         }
 
-        const finalCell = potentialCells[Math.floor(Math.random() * potentialCells.length)];
+        const finalCell = potentialCells[Math.floor(RandomNumberGenerator.next() * potentialCells.length)];
         if (!finalCell) {
             return cells[0];
         }

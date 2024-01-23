@@ -30,7 +30,7 @@ class Grid {
         while (stack.length > 0) {
             const neighbours = this.getNeighbours(currentCell, false, 2).filter(neighbour => !neighbour.visited);
             if (neighbours.length > 0) {
-                const randomCell = neighbours[Math.floor(Math.random() * neighbours.length)];
+                const randomCell = neighbours[Math.floor(RandomNumberGenerator.next() * neighbours.length)];
                 const newCell = new Free(randomCell.row, randomCell.col);
                 newCell.visited = true;
                 this.setCell(newCell.row, newCell.col, newCell);
@@ -53,19 +53,19 @@ class Grid {
 
         for (let row = 1; row < cellNumber - 1; row++)
             for (let col = 1; col < cellNumber - 1; col++)
-                if (this.cells[row][col] instanceof Obstacle && Math.random() < additionalObstaclesRatio)
+                if (this.cells[row][col] instanceof Obstacle && RandomNumberGenerator.next() < additionalObstaclesRatio)
                     this.setCell(row, col, new Free(row, col));
     }
 
     generateFood(cellNumber) {
         const maxIterations = 5000;
         for (let i = 0; i < this.foodNumber; i++) {
-            let randomRow = Math.floor(Math.random() * (cellNumber - 2)) + 1;
-            let randomCol = Math.floor(Math.random() * (cellNumber - 2)) + 1;
+            let randomRow = Math.floor(RandomNumberGenerator.next() * (cellNumber - 2)) + 1;
+            let randomCol = Math.floor(RandomNumberGenerator.next() * (cellNumber - 2)) + 1;
             let currentIteration = 0;
             while (!(this.cells[randomRow][randomCol] instanceof Cell) && currentIteration < maxIterations) {
-                randomRow = Math.floor(Math.random() * (cellNumber - 2)) + 1;
-                randomCol = Math.floor(Math.random() * (cellNumber - 2)) + 1;
+                randomRow = Math.floor(RandomNumberGenerator.next() * (cellNumber - 2)) + 1;
+                randomCol = Math.floor(RandomNumberGenerator.next() * (cellNumber - 2)) + 1;
                 currentIteration++;
             }
             if (currentIteration < maxIterations)

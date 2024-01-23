@@ -1,12 +1,6 @@
 class Model {
 
-    SIZE = 51;
-    FOOD_COUNT = 5;
-    ANTS_COUNT = 50;
-    PHEROMONE_EVAPORATION_RATE = 0.996;
-    MAX_HISTORY_LENGTH = 100;
-
-    timeCount = 0;
+    timeAccumulator = 0;
 
     constructor() {
         this.init();
@@ -15,9 +9,9 @@ class Model {
     init() {
         this.clock = new Clock(this.tick.bind(this));
         this.time = new Time();
-        this.grid = new Grid(this.SIZE, this.FOOD_COUNT);
+        this.grid = new Grid(Options.SIZE, Options.FOOD_COUNT);
         this.antsManager = new AntsManager();
-        this.antsManager.initAnts(this.grid.startCell, this.ANTS_COUNT);
+        this.antsManager.initAnts(this.grid.startCell, Options.ANTS_COUNT);
         this.history = [];
         if (this.updateActionButtonText)
             this.updateActionButtonText("Start");
@@ -36,13 +30,13 @@ class Model {
     }
 
     bindChangeGridSize(newSize) {
-        this.SIZE = newSize;
+        Options.SIZE = newSize;
         this.init();
         this.updateCanvasCells(this.grid.getCells(), this.antsManager.ants);
     }
 
     bindChangeFood(newFood) {
-        this.FOOD_COUNT = newFood;
+        Options.FOOD_COUNT = newFood;
         this.init();
         this.updateCanvasCells(this.grid.getCells(), this.antsManager.ants);
     }
@@ -54,51 +48,56 @@ class Model {
     }
 
     tick(deltaTime) {
-        this.timeCount += deltaTime;
-        if (this.timeCount > 1000) {
-            this.timeCount = 0;
+        this.timeAccumulator += deltaTime / 1000;
 
+        if (this.timeAccumulator >= 1 / Options.CELL_PER_SECOND) {
             this.antsManager.moveAnts(this.grid);
-            this.grid.updatePheromones(this.PHEROMONE_EVAPORATION_RATE);
-
-            this.history.push({
-                antsManager: this.antsManager.clone(),
-                grid: this.grid.clone(),
-            });
-            if (this.history.length > this.MAX_HISTORY_LENGTH)
-                this.history.shift();
+            this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE);
+            this.updateHistory();
+            this.timeAccumulator -= 1 / Options.CELL_PER_SECOND;
         }
 
         this.displayCanvasCells(this.grid.getCells(), this.antsManager.ants, deltaTime);
         this.updateChronometer(this.time.getFormattedElapsedTime());
     }
 
+    updateHistory() {
+        this.history.push({
+            antsManager: this.antsManager.clone(),
+            grid: this.grid.clone(),
+        });
+        if (this.history.length > Options.MAX_HISTORY_LENGTH)
+            this.history.shift();
+    }
+
     updateCanvasCells(cells, ants) {
-        this.displayCanvasCells(cells, ants);
+        this.displayCanvasCells(cells, ants, 0);
     }
 
     bindBackwardButton() {
         if (this.history.length > 1) {
             const last = this.history.pop();
             this.grid = last.grid;
+            this.time = last.time;
             this.antsManager = last.antsManager;
-            // this.time = last.time;
             this.updateChronometer(this.time.getFormattedElapsedTime());
-            this.displayCanvasCells(this.grid.getCells(), this.antsManager.ants);
+            this.displayCanvasCells(this.grid.getCells(), this.antsManager.ants, 0);
         }
     }
 
     bindForwardButton() {
-        this.tick(0.1);
+        if (!this.time.hasBeenStarted())
+            this.time.start();
+        this.tick(1000 / this.clock.fps * Options.CELL_PER_SECOND);
     }
 
     bindActionButton() {
-        if (this.clock.running) {
+        if (this.clock.isRunning()) {
             this.clock.stop();
             this.time.pause();
             this.updateActionButtonText("Resume");
         } else {
-            if (this.time.paused) {
+            if (this.time.isPaused()) {
                 this.time.resume();
             } else {
                 this.time.start();
@@ -147,6 +146,8 @@ class View {
     }
 
     initView() {
+        this.canvas = new Canvas(document.getElementById('canvas').getContext('2d'));
+
         this.chronometer = document.getElementById("chronometer");
 
         this.backwardButton = document.getElementById('previous');
@@ -179,14 +180,19 @@ class View {
             this.bindChangeAnts();
         });
 
+        this.slow = document.getElementById('slow');
+        this.slow.addEventListener('click', () => {
+            Options.CELL_PER_SECOND = 1;
+        });
 
-        const antImage = new Image();
-        antImage.src = "assets/tiles/ant.png";
-        Promise.all([
-            new Promise(resolve => antImage.onload = resolve),
-        ]).then(() => {
-            console.log("Images loaded")
-            this.canvas = new Canvas(document.getElementById('canvas').getContext('2d'), antImage);
+        this.medium = document.getElementById('normal');
+        this.medium.addEventListener('click', () => {
+            Options.CELL_PER_SECOND = 6;
+        });
+
+        this.fast = document.getElementById('fast');
+        this.fast.addEventListener('click', () => {
+            Options.CELL_PER_SECOND = 12;
         });
 
     }
@@ -220,7 +226,7 @@ class Controller {
         this.model.bindDisplayCanvasCells(this.bindDisplayCanvasCells.bind(this));
         this.model.bindUpdateActionButtonText(this.bindUpdateActionButtonText.bind(this));
 
-        this.model.updateCanvasCells(this.model.grid.cells, this.model.antsManager.ants);
+        this.model.updateCanvasCells(this.model.grid.cells, [], 0);
     }
 
     bindChangeGridSize() {
@@ -260,5 +266,19 @@ class Controller {
     }
 
 }
+
+class Options {
+
+    static SIZE = 21;
+    static FOOD_COUNT = 5;
+    static ANTS_COUNT = 5;
+    static PHEROMONE_EVAPORATION_RATE = 0.996;
+    static MAX_HISTORY_LENGTH = 100;
+    static CELL_PER_SECOND = 6;
+
+}
+
+// TODO: REMOVE IT (FOR TESTS ONLY)
+RandomNumberGenerator.setSeed(10);
 
 const app = new Controller(new Model(), new View());
