@@ -273,7 +273,7 @@ class Options {
 
     static SIZE = 29;
     static FOOD_COUNT = 5;
-    static ANTS_COUNT = 5;
+    static ANTS_COUNT = 100;
     static PHEROMONE_EVAPORATION_RATE = 0.99;
     static MAX_HISTORY_LENGTH = 100;
     static CELL_PER_SECOND = 6;

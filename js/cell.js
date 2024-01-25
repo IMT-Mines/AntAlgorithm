@@ -19,6 +19,10 @@ class Cell {
     multiplyPheromone(rate) {
         this.pheromone *= rate;
     }
+
+    getColor() {
+        return this.color;
+    }
 }
 
 class Obstacle extends Cell {
