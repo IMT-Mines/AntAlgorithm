@@ -26,13 +26,14 @@ class Canvas {
     assets = {
         ant: "assets/tiles/ant.png", // this.antAsset
         grass: "assets/tiles/grass.png", // this.grassAsset
+        shadow: "assets/tiles/shadow.png", // this.showAsset
         tree: "assets/tiles/tree.png", // this.treeAsset
+        foodAndColony: "assets/tiles/foodAndColony.png", // this.foodAndColonyAsset
     }
 
-    constructor(ctx, grid) {
+    constructor(ctx) {
         this.ctx = ctx;
-        this.grid = grid;
-        this.ctx.imageSmoothingEnabled = false;
+        this.ctx.globalAlpha = 0.5;
         this.ctx.fillStyle = "white";
         this.width = this.ctx.canvas.width;
         this.height = this.ctx.canvas.height;
@@ -40,6 +41,10 @@ class Canvas {
         this.ctx.canvas.width *= devicePixelRatio;
         this.ctx.canvas.height *= devicePixelRatio;
         this.ctx.scale(devicePixelRatio, devicePixelRatio);
+        this.isFirstDraw = true;
+        this.randomFood = {};
+        this.randomStart = {};
+        this.randomGround = {};
     }
 
     loadImage(src) {
@@ -62,35 +67,83 @@ class Canvas {
     draw(grid, antsMap, deltaTime) {
         const cellWidth = this.width / grid.cells[0].length;
         const cellHeight = this.height / grid.cells.length;
-        this.drawCells(grid, cellWidth, cellHeight);
-        this.drawAnts(antsMap, cellWidth, cellHeight, deltaTime);
-    }
-
-    drawCells(grid, cellWidth, cellHeight) {
         this.ctx.clearRect(0, 0, this.width, this.height);
 
         for (let col = 0; col < grid.cells.length; col++) {
             for (let row = 0; row < grid.cells[col].length; row++) {
                 const cell = grid.cells[row][col];
-                this.ctx.fillStyle = cell.getColor();
-
-                if (cell instanceof Food) {
-                    this.ctx.fillStyle = cell.color;
-                    if (cell.getFoodQuantity() < 0)
-                        this.ctx.fillStyle = "orange";
-                } else if (cell instanceof Free) {
-                    const pheromone = cell.getPheromone();
-                    const color = Math.floor(pheromone * 255);
-                    // TODO: parametrize this
-                    this.ctx.globalAlpha = (pheromone < 0.05) ? pheromone / 0.05 : 1;
-                    this.ctx.fillStyle = color === 0 ? "white" : `rgb(${color}, 0, ${255 - color})`;
-                }
-
-                this.ctx.globalAlpha = 1;
-                this.ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
-
+                if (this.isFirstDraw) this.generateRandomValue(cell);
+                this.drawGround(cell, row, col, cellWidth, cellHeight);
+                this.drawStartAndFood(cell, row, col, cellWidth, cellHeight);
+                this.drawObstacles(cell, row, col, cellWidth, cellHeight);
+                // this.drawPheromones(cell, row, col, cellWidth, cellHeight);
             }
         }
+        this.drawAnts(antsMap, cellWidth, cellHeight, deltaTime);
+        this.isFirstDraw = false;
+    }
+
+    generateRandomValue(cell) {
+        if (cell instanceof Start) {
+            this.randomStart[cell] = Math.floor(RandomNumberGenerator.next() * 12);
+        } else if (cell instanceof Food) {
+            this.randomFood[cell] = Math.floor(RandomNumberGenerator.next() * 15);
+        }
+        const possibleGround = [{ x: 0, y: 0 }, { x: 64, y: 0 }, { x: 64, y: 64 }, { x: 64, y: 0 }]
+        this.randomGround[cell] = possibleGround[Math.floor(RandomNumberGenerator.next() * possibleGround.length)];
+        this.randomGround[cell].x += (Math.floor(RandomNumberGenerator.next() * 3) < 2 ? 128 : 0);
+    }
+
+    drawGround(cell, row, col, cellWidth, cellHeight) {
+        this.ctx.drawImage(this.grassAsset,
+            this.randomGround[cell].x, this.randomGround[cell].y,
+            64, 64,
+            col * cellWidth, row * cellHeight,
+            cellWidth, cellHeight);
+    }
+
+    drawStartAndFood(cell, row, col, cellWidth, cellHeight) {
+        if (cell instanceof Food && cell.getFoodQuantity() > 0) {
+            this.ctx.drawImage(this.foodAndColonyAsset,
+                this.randomFood[cell] * 32, 14 * 32,
+                32, 32,
+                col * cellWidth, row * cellHeight,
+                cellWidth, cellHeight);
+        } else if (cell instanceof Start) {
+            this.ctx.drawImage(this.foodAndColonyAsset,
+                32 + this.randomStart[cell] * 32, 20 * 32,
+                32, 32,
+                col * cellWidth, row * cellHeight,
+                cellWidth, cellHeight);
+        }
+    }
+
+    drawObstacles(cell, row, col, cellWidth, cellHeight) {
+        if (cell instanceof Obstacle) {
+            this.ctx.drawImage(this.grassAsset,
+                0, 0,
+                128, 128,
+                col * cellWidth, row * cellHeight,
+                cellWidth, cellHeight);
+            this.ctx.drawImage(this.shadowAsset,
+                45, 96,
+                90, 56,
+                col * cellWidth, row * cellHeight,
+                cellWidth, cellHeight);
+            this.ctx.drawImage(this.treeAsset,
+                16, 16,
+                138, 150,
+                col * cellWidth - cellWidth * 0.2, row * cellHeight - cellHeight * 0.5,
+                cellWidth * 1.5, cellHeight * 1.8);
+        }
+    }
+
+    drawPheromones(cell, row, col, cellWidth, cellHeight) {
+        if (!(cell instanceof Free)) return;
+        const pheromone = cell.getPheromone();
+        const color = Math.floor(pheromone * 255);
+        this.ctx.fillStyle = color === 0 ? "white" : `rgb(${color}, 0, ${255 - color})`;
+        this.ctx.fillRect(col * cellWidth + cellWidth * 0.25, row * cellHeight + cellHeight * 0.25, cellWidth / 2, cellHeight / 2);
     }
 
 
@@ -126,59 +179,59 @@ class Canvas {
         }
     }
 
-    drawObstacles() {
-        // TODO: DRAW OBASTACLES ON A DIFFERENT CANVAS (different layer to only draw once)
-        for (let col = 1; col < grid.cells.length - 1; col++) {
-            for (let row = 1; row < grid.cells[0].length - 1; row++) {
-                const cell = grid.cells[row][col];
-                if (cell instanceof Obstacle) {
-                    const neighbours = grid.getNeighbours(cell, false);
-                    const pattern = neighbours.map(neighbour => neighbour instanceof Obstacle ? 1 : 0).join('');
-                    const { blockX, blockY } = this.getWallAssetFromPattern(pattern);
-                    this.ctx.drawImage(this.tilesetAsset,
-                        blockX * this.BLOCK_WIDTH, blockY * this.BLOCK_WIDTH,
-                        this.BLOCK_WIDTH, this.BLOCK_WIDTH,
-                        col * cellWidth, row * cellHeight,
-                        cellWidth, cellHeight);
-                }
-            }
-        }
-
-        // const top = this.getWallAssetFromPattern("1101");
-        // const right = this.getWallAssetFromPattern("1110");
-        // const bottom = this.getWallAssetFromPattern("0111");
-        // const left = this.getWallAssetFromPattern("1011");
-        const top = this.getWallAssetFromPattern("1111");
-        const right = this.getWallAssetFromPattern("1111");
-        const bottom = this.getWallAssetFromPattern("1111");
-        const left = this.getWallAssetFromPattern("1111");
-
-        for (let i = 0; i < grid.cells.length; i++) {
-            this.ctx.drawImage(this.tilesetAsset,
-                top.blockX * this.BLOCK_WIDTH, top.blockY * this.BLOCK_WIDTH,
-                this.BLOCK_WIDTH, this.BLOCK_WIDTH,
-                i * cellWidth, 0,
-                cellWidth, cellHeight);
-
-            this.ctx.drawImage(this.tilesetAsset,
-                right.blockX * this.BLOCK_WIDTH, right.blockY * this.BLOCK_WIDTH,
-                this.BLOCK_WIDTH, this.BLOCK_WIDTH,
-                (grid.cells.length - 1) * cellWidth, i * cellHeight,
-                cellWidth, cellHeight);
-
-            this.ctx.drawImage(this.tilesetAsset,
-                left.blockX * this.BLOCK_WIDTH, left.blockY * this.BLOCK_WIDTH,
-                this.BLOCK_WIDTH, this.BLOCK_WIDTH,
-                0, i * cellHeight,
-                cellWidth, cellHeight);
-
-            this.ctx.drawImage(this.tilesetAsset,
-                bottom.blockX * this.BLOCK_WIDTH, bottom.blockY * this.BLOCK_WIDTH,
-                this.BLOCK_WIDTH, this.BLOCK_WIDTH,
-                i * cellWidth, (grid.cells[0].length - 1) * cellHeight,
-                cellWidth, cellHeight);
-        }
-    }
+    // drawObstacles() {
+    //     // TODO: DRAW OBASTACLES ON A DIFFERENT CANVAS (different layer to only draw once)
+    //     for (let col = 1; col < grid.cells.length - 1; col++) {
+    //         for (let row = 1; row < grid.cells[0].length - 1; row++) {
+    //             const cell = grid.cells[row][col];
+    //             if (cell instanceof Obstacle) {
+    //                 const neighbours = grid.getNeighbours(cell, false);
+    //                 const pattern = neighbours.map(neighbour => neighbour instanceof Obstacle ? 1 : 0).join('');
+    //                 const { blockX, blockY } = this.getWallAssetFromPattern(pattern);
+    //                 this.ctx.drawImage(this.tilesetAsset,
+    //                     blockX * this.BLOCK_WIDTH, blockY * this.BLOCK_WIDTH,
+    //                     this.BLOCK_WIDTH, this.BLOCK_WIDTH,
+    //                     col * cellWidth, row * cellHeight,
+    //                     cellWidth, cellHeight);
+    //             }
+    //         }
+    //     }
+    //
+    //     // const top = this.getWallAssetFromPattern("1101");
+    //     // const right = this.getWallAssetFromPattern("1110");
+    //     // const bottom = this.getWallAssetFromPattern("0111");
+    //     // const left = this.getWallAssetFromPattern("1011");
+    //     const top = this.getWallAssetFromPattern("1111");
+    //     const right = this.getWallAssetFromPattern("1111");
+    //     const bottom = this.getWallAssetFromPattern("1111");
+    //     const left = this.getWallAssetFromPattern("1111");
+    //
+    //     for (let i = 0; i < grid.cells.length; i++) {
+    //         this.ctx.drawImage(this.tilesetAsset,
+    //             top.blockX * this.BLOCK_WIDTH, top.blockY * this.BLOCK_WIDTH,
+    //             this.BLOCK_WIDTH, this.BLOCK_WIDTH,
+    //             i * cellWidth, 0,
+    //             cellWidth, cellHeight);
+    //
+    //         this.ctx.drawImage(this.tilesetAsset,
+    //             right.blockX * this.BLOCK_WIDTH, right.blockY * this.BLOCK_WIDTH,
+    //             this.BLOCK_WIDTH, this.BLOCK_WIDTH,
+    //             (grid.cells.length - 1) * cellWidth, i * cellHeight,
+    //             cellWidth, cellHeight);
+    //
+    //         this.ctx.drawImage(this.tilesetAsset,
+    //             left.blockX * this.BLOCK_WIDTH, left.blockY * this.BLOCK_WIDTH,
+    //             this.BLOCK_WIDTH, this.BLOCK_WIDTH,
+    //             0, i * cellHeight,
+    //             cellWidth, cellHeight);
+    //
+    //         this.ctx.drawImage(this.tilesetAsset,
+    //             bottom.blockX * this.BLOCK_WIDTH, bottom.blockY * this.BLOCK_WIDTH,
+    //             this.BLOCK_WIDTH, this.BLOCK_WIDTH,
+    //             i * cellWidth, (grid.cells[0].length - 1) * cellHeight,
+    //             cellWidth, cellHeight);
+    //     }
+    // }
 
     getWallAssetFromPattern(pattern) {
         const wall = this.wallPlacement.find(wall => wall.pattern === pattern);

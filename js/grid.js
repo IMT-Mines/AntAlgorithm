@@ -1,6 +1,6 @@
 class Grid {
 
-    constructor(cellNumber, foodNumber, additionalObstaclesRatio = 0.2) {
+    constructor(cellNumber, foodNumber, additionalObstaclesRatio = 0.15) {
         this.cells = [];
         this.foodNumber = foodNumber;
         this.initCells(cellNumber, additionalObstaclesRatio);
