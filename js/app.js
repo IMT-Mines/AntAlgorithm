@@ -29,20 +29,14 @@ class Model {
         this.updateActionButtonText = callback;
     }
 
-    bindChangeGridSize(newSize) {
-        Options.SIZE = newSize;
-        this.init();
-        this.updateCanvasCells(this.grid, this.antsManager.ants);
-    }
-
-    bindChangeFood(newFood) {
-        Options.FOOD_COUNT = newFood;
-        this.init();
-        this.updateCanvasCells(this.grid, this.antsManager.ants);
-    }
-
-    bindChangeAnts(newAnts) {
-        this.ANTS_COUNT = newAnts;
+    bindParameters(parameters) {
+        Options.SIZE = parseInt(parameters.gridSize);
+        Options.FOOD_COUNT = parseInt(parameters.food);
+        Options.ANTS_COUNT = parseInt(parameters.ants);
+        Options.PHEROMONE_EVAPORATION_RATE = parseFloat(parameters.pheromonesEvaporation);
+        this.antsManager.setDropParameter(parseFloat(parameters.dropParameter));
+        this.antsManager.setExplorationRate(parseFloat(parameters.explorationRate));
+        this.antsManager.setAlpha(parseFloat(parameters.alpha));
         this.init();
         this.updateCanvasCells(this.grid, this.antsManager.ants);
     }
@@ -115,9 +109,7 @@ class View {
         this.backwardButton;
         this.forwardButton;
         this.actionButton;
-        this.gridSize;
-        this.food;
-        this.ants;
+        this.parameters;
         this.initView();
     }
 
@@ -133,17 +125,10 @@ class View {
         this.bindActionButton = callback;
     }
 
-    bindChangeGridSize(callback) {
-        this.bindChangeGridSize = callback;
+    bindParameters(callback) {
+        this.bindParameters = callback;
     }
 
-    bindChangeFood(callback) {
-        this.bindChangeFood = callback;
-    }
-
-    bindChangeAnts(callback) {
-        this.bindChangeAnts = callback;
-    }
 
     initView() {
         this.canvas = new Canvas(document.getElementById('canvas').getContext('2d'));
@@ -165,20 +150,15 @@ class View {
             this.bindActionButton();
         });
 
-        this.gridSize = document.getElementById('gridSize');
-        this.gridSize.addEventListener('change', () => {
-            this.bindChangeGridSize();
+
+        this.parameters = document.getElementById('form');
+        this.parameters.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(this.parameters);
+            const data = Object.fromEntries(formData.entries());
+            this.bindParameters(data);
         });
 
-        this.food = document.getElementById('food');
-        this.food.addEventListener('change', () => {
-            this.bindChangeFood();
-        });
-
-        this.ants = document.getElementById('ants');
-        this.ants.addEventListener('change', () => {
-            this.bindChangeAnts();
-        });
 
         this.slow = document.getElementById('slow');
         this.slow.addEventListener('click', () => {
@@ -193,6 +173,11 @@ class View {
         this.fast = document.getElementById('fast');
         this.fast.addEventListener('click', () => {
             Options.CELL_PER_SECOND = 12;
+        });
+
+        this.veryFast = document.getElementById('crazy');
+        this.veryFast.addEventListener('click', () => {
+            Options.CELL_PER_SECOND = 60;
         });
 
     }
@@ -218,9 +203,7 @@ class Controller {
         this.view.bindBackwardButton(this.bindBackwardButton.bind(this));
         this.view.bindForwardButton(this.bindForwardButton.bind(this));
         this.view.bindActionButton(this.bindActionButton.bind(this));
-        this.view.bindChangeGridSize(this.bindChangeGridSize.bind(this));
-        this.view.bindChangeFood(this.bindChangeFood.bind(this));
-        this.view.bindChangeAnts(this.bindChangeAnts.bind(this));
+        this.view.bindParameters(this.bindParameters.bind(this));
 
         this.model.bindDisplayChronometer(this.bindDisplayChronometer.bind(this));
         this.model.bindDisplayCanvasCells(this.bindDisplayCanvasCells.bind(this));
@@ -231,16 +214,8 @@ class Controller {
         });
     }
 
-    bindChangeGridSize() {
-        this.model.bindChangeGridSize(this.view.gridSize.value);
-    }
-
-    bindChangeFood() {
-        this.model.bindChangeFood(this.view.food.value);
-    }
-
-    bindChangeAnts() {
-        this.model.bindChangeAnts(this.view.ants.value);
+    bindParameters(parameters) {
+        this.model.bindParameters(parameters);
     }
 
     bindBackwardButton() {
@@ -270,14 +245,12 @@ class Controller {
 }
 
 class Options {
-
     static SIZE = 19;
     static FOOD_COUNT = 5;
     static ANTS_COUNT = 10;
     static PHEROMONE_EVAPORATION_RATE = 0.99;
     static MAX_HISTORY_LENGTH = 100;
     static CELL_PER_SECOND = 6;
-
 }
 
 // TODO: REMOVE IT (FOR TESTS ONLY or not?)

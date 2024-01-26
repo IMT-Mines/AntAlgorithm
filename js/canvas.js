@@ -65,7 +65,7 @@ class Canvas {
     }
 
     draw(grid, antsMap, deltaTime) {
-        const cellWidth = this.width / grid.cells[0].length;
+        const cellWidth = this.width / grid.cells.length;
         const cellHeight = this.height / grid.cells.length;
         this.ctx.clearRect(0, 0, this.width, this.height);
 
@@ -169,13 +169,13 @@ class Canvas {
             ant.y += deltaY;
 
             // TODO: fix ant rotation
-            // this.ctx.save();
-            // this.ctx.translate(ant.x * cellWidth + cellWidth / 2, ant.y * cellHeight + cellHeight / 2);
-            // this.ctx.rotate(rotation);
-            // this.ctx.drawImage(this.antAsset, -cellWidth / 2, -cellHeight / 2, cellWidth / 2, cellHeight);
-            // this.ctx.restore();
+            this.ctx.save();
+            this.ctx.translate(ant.x * cellWidth + cellWidth / 2, ant.y * cellHeight + cellHeight / 2);
+            this.ctx.rotate(rotation);
+            this.ctx.drawImage(this.antAsset, -cellWidth / 2, -cellHeight / 2, cellWidth, cellHeight);
+            this.ctx.restore();
 
-            this.ctx.drawImage(this.antAsset, ant.x * cellWidth, ant.y * cellHeight, cellWidth, cellHeight);
+            // this.ctx.drawImage(this.antAsset, ant.x * cellWidth, ant.y * cellHeight, cellWidth /2, cellHeight /2);
         }
     }
 

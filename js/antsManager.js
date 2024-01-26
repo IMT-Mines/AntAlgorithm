@@ -1,13 +1,26 @@
 class AntsManager {
 
     ALREADY_VISITED_MALUS = 0.1;
-    EXPLORATION_RATE = 0.1;
-    ALPHA = 1;
-    DROP_PARAMETER = 0.5;
 
     constructor() {
+        this.alpha = 1;
+        this.explorationRate = 0.1;
+        this.dropParameter = 0.5;
         this.ants = new Map();
     }
+
+    setAlpha(alpha) {
+        this.alpha = alpha;
+    }
+
+    setExplorationRate(explorationRate) {
+        this.explorationRate = explorationRate;
+    }
+
+    setDropParameter(dropParameter) {
+        this.dropParameter = dropParameter;
+    }
+
 
     initAnts(startCell, antNumber) {
         for (let i = 0; i < antNumber; i++) {
@@ -31,11 +44,13 @@ class AntsManager {
 
             let sumDenominator = 0;
             for (let neighbour of neighbours) {
-                sumDenominator += this.EXPLORATION_RATE + neighbour.getPheromone() ** this.ALPHA;
+                const malus = this.isAlreadyVisited(neighbour, ant) ? this.ALREADY_VISITED_MALUS : 0;
+                sumDenominator += this.explorationRate + neighbour.getPheromone() ** this.alpha;
             }
 
             for (let neighbour of neighbours) {
-                const numerator = this.EXPLORATION_RATE + neighbour.getPheromone() ** this.ALPHA;
+                const malus = this.isAlreadyVisited(neighbour, ant) ? this.ALREADY_VISITED_MALUS : 0;
+                const numerator = this.explorationRate + neighbour.getPheromone() ** this.alpha;
                 const result = numerator / sumDenominator;
                 probability.push(result);
             }
@@ -56,6 +71,16 @@ class AntsManager {
         }
     }
 
+    isAlreadyVisited(cell, ant) {
+        const history = ant.getHistory();
+        for (let i = history.length - 1; i >= history.length / 2; i--) {
+            if (history[i] === cell) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Find the cell with the highest probability, but if the cell has already been visited, it will be penalized
@@ -66,24 +91,45 @@ class AntsManager {
      * @returns {*}  // TODO Review return code (can return undefined ??)
      */
     selectCell(ant, cells, probabilities) {
-        for (let cell of cells) {
-            const history = ant.getHistory();
-            for (let i = history.length - 1; i >= 0; i--) {
-                if (history[i] === cell) {
-                    probabilities[cells.indexOf(cell)] *= this.ALREADY_VISITED_MALUS;
-                }
-            }
-        }
+        // for (let cell of cells) {
+        //     const history = ant.getHistory();
+        //     for (let i = history.length - 1; i >= 0; i--) {
+        //         if (history[i] === cell) {
+        //             probabilities[cells.indexOf(cell)] *= this.ALREADY_VISITED_MALUS;
+        //         }
+        //     }
+        // }
 
-        const maxProbability = Math.max(...probabilities);
-        const potentialCells = [];
+        const probability = Math.random();
+        console.log("Probability = " + probability);
+        console.log("List of probabilities : " + probabilities);
+
+        let cumulativeProbability = 0;
         for (let i = 0; i < probabilities.length; i++) {
-            if (probabilities[i] === maxProbability) {
-                potentialCells.push(cells[i]);
+            cumulativeProbability += probabilities[i];
+            console.log(cumulativeProbability);
+            if (probability < cumulativeProbability) {
+                console.log("SELECTED CELL Probability = " + probabilities[i]);
+                console.log("================================")
+                return cells[i];
             }
         }
 
-        return potentialCells[Math.floor(Math.random() * potentialCells.length)];
+        console.log("================================")
+        return cells[cells.length - 1];
+
+
+        // return potentialCells[Math.floor(Math.random() * potentialCells.length)];
+
+        // const maxProbability = Math.max(...probabilities);
+        // const potentialCells = [];
+        // for (let i = 0; i < probabilities.length; i++) {
+        //     if (probabilities[i] === maxProbability) {
+        //         potentialCells.push(cells[i]);
+        //     }
+        // }
+        //
+        // return potentialCells[Math.floor(Math.random() * potentialCells.length)];
     }
 
     /**
@@ -110,7 +156,7 @@ class AntsManager {
 
 
     dropPheromone(ant, cell) {
-        cell.addPheromone(this.DROP_PARAMETER / ant.pathLength);
+        cell.addPheromone(this.dropParameter / ant.pathLength);
     }
 
     clone() {
