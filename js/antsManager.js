@@ -1,10 +1,10 @@
 class AntsManager {
 
-    ALREADY_VISITED_MALUS = 0.1;
+    ALREADY_VISITED_MALUS = 1;
 
     constructor() {
         this.alpha = 1;
-        this.explorationRate = 0.1;
+        this.explorationRate = 1;
         this.dropParameter = 0.5;
         this.ants = new Map();
     }
@@ -45,12 +45,12 @@ class AntsManager {
             let sumDenominator = 0;
             for (let neighbour of neighbours) {
                 const malus = this.isAlreadyVisited(neighbour, ant) ? this.ALREADY_VISITED_MALUS : 0;
-                sumDenominator += this.explorationRate + neighbour.getPheromone() ** this.alpha;
+                sumDenominator += this.explorationRate + neighbour.getPheromone() ** this.alpha - malus;
             }
 
             for (let neighbour of neighbours) {
                 const malus = this.isAlreadyVisited(neighbour, ant) ? this.ALREADY_VISITED_MALUS : 0;
-                const numerator = this.explorationRate + neighbour.getPheromone() ** this.alpha;
+                const numerator = this.explorationRate + neighbour.getPheromone() ** this.alpha - malus;
                 const result = numerator / sumDenominator;
                 probability.push(result);
             }
@@ -73,7 +73,7 @@ class AntsManager {
 
     isAlreadyVisited(cell, ant) {
         const history = ant.getHistory();
-        for (let i = history.length - 1; i >= history.length / 2; i--) {
+        for (let i = history.length - 1; i > history.length - 10; i--) {
             if (history[i] === cell) {
                 return true;
             }
@@ -82,54 +82,16 @@ class AntsManager {
     }
 
 
-    /**
-     * Find the cell with the highest probability, but if the cell has already been visited, it will be penalized
-     * by ALREADY_VISITED_MALUS factor
-     * @param ant The ant
-     * @param cells The cells to choose from
-     * @param probabilities The probabilities of each cell
-     * @returns {*}  // TODO Review return code (can return undefined ??)
-     */
     selectCell(ant, cells, probabilities) {
-        // for (let cell of cells) {
-        //     const history = ant.getHistory();
-        //     for (let i = history.length - 1; i >= 0; i--) {
-        //         if (history[i] === cell) {
-        //             probabilities[cells.indexOf(cell)] *= this.ALREADY_VISITED_MALUS;
-        //         }
-        //     }
-        // }
-
         const probability = Math.random();
-        console.log("Probability = " + probability);
-        console.log("List of probabilities : " + probabilities);
-
         let cumulativeProbability = 0;
         for (let i = 0; i < probabilities.length; i++) {
             cumulativeProbability += probabilities[i];
-            console.log(cumulativeProbability);
             if (probability < cumulativeProbability) {
-                console.log("SELECTED CELL Probability = " + probabilities[i]);
-                console.log("================================")
                 return cells[i];
             }
         }
-
-        console.log("================================")
         return cells[cells.length - 1];
-
-
-        // return potentialCells[Math.floor(Math.random() * potentialCells.length)];
-
-        // const maxProbability = Math.max(...probabilities);
-        // const potentialCells = [];
-        // for (let i = 0; i < probabilities.length; i++) {
-        //     if (probabilities[i] === maxProbability) {
-        //         potentialCells.push(cells[i]);
-        //     }
-        // }
-        //
-        // return potentialCells[Math.floor(Math.random() * potentialCells.length)];
     }
 
     /**

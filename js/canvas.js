@@ -76,7 +76,7 @@ class Canvas {
                 this.drawGround(cell, row, col, cellWidth, cellHeight);
                 this.drawStartAndFood(cell, row, col, cellWidth, cellHeight);
                 this.drawObstacles(cell, row, col, cellWidth, cellHeight);
-                // this.drawPheromones(cell, row, col, cellWidth, cellHeight);
+                this.drawPheromones(cell, row, col, cellWidth, cellHeight);
             }
         }
         this.drawAnts(antsMap, cellWidth, cellHeight, deltaTime);
@@ -100,6 +100,13 @@ class Canvas {
             64, 64,
             col * cellWidth, row * cellHeight,
             cellWidth, cellHeight);
+
+        // draw text coordinates
+        this.ctx.fillStyle = "black";
+        this.ctx.font = "10px Arial";
+        this.ctx.fillText(`${row}, ${col}`, col * cellWidth + 5, row * cellHeight + 10);
+
+
     }
 
     drawStartAndFood(cell, row, col, cellWidth, cellHeight) {

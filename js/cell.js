@@ -38,7 +38,7 @@ class Food extends Cell {
     constructor(row, col) {
         super(row, col);
         this.color = "#ffd500";
-        this.foodQuantity = 15;
+        this.foodQuantity = 1;
     }
 
     addFoodQuantity(quantity) {

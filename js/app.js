@@ -245,15 +245,15 @@ class Controller {
 }
 
 class Options {
-    static SIZE = 19;
-    static FOOD_COUNT = 5;
-    static ANTS_COUNT = 10;
-    static PHEROMONE_EVAPORATION_RATE = 0.99;
+    static SIZE = 10;
+    static FOOD_COUNT = 2;
+    static ANTS_COUNT = 1;
+    static PHEROMONE_EVAPORATION_RATE = 0.97;
     static MAX_HISTORY_LENGTH = 100;
     static CELL_PER_SECOND = 6;
 }
 
 // TODO: REMOVE IT (FOR TESTS ONLY or not?)
-RandomNumberGenerator.setSeed(17);
+RandomNumberGenerator.setSeed(3);
 
 const app = new Controller(new Model(), new View());
