@@ -22,52 +22,59 @@ class AntsManager {
     }
 
 
-    initAnts(startCell, antNumber) {
+    initAnts(grid, antNumber, cellSize) {
+        const startCell = grid.startCell;
         for (let i = 0; i < antNumber; i++) {
             const ant = new Ant();
-            ant.x = startCell.col;
-            ant.y = startCell.row;
+            ant.x = startCell.col * cellSize;
+            ant.y = startCell.row * cellSize;
             ant.getHistory().push(startCell)
             this.ants.set(ant, startCell);
+            this.getNextGoal(ant, grid);
         }
     }
 
-    moveAnts(grid) {
-        for (let ant of this.ants.keys()) {
-            if (ant.isBackToStartCell()) {
-                this.backToStartCell(ant);
-                continue;
-            }
-            const currentCell = this.ants.get(ant);
-            const neighbours = grid.getNeighbours(currentCell);
-            const probability = [];
+    hasReachGoal(ant, cellSize) {
+        const goal = this.ants.get(ant);
+        const goalX = goal.col * cellSize;
+        const goalY = goal.row * cellSize;
+        return Math.abs(ant.x - goalX) <= 5 && Math.abs(ant.y - goalY) <= 5;
+    }
 
-            let sumDenominator = 0;
-            for (let neighbour of neighbours) {
-                const malus = this.isAlreadyVisited(neighbour, ant) ? this.ALREADY_VISITED_MALUS : 0;
-                sumDenominator += this.explorationRate + neighbour.getPheromone() ** this.alpha - malus;
-            }
+    getNextGoal(ant, grid) {
+        if (ant.isBackToStartCell()) {
+            this.backToStartCell(ant);
+            return;
+        }
+        const currentCell = this.ants.get(ant);
+        const neighbours = grid.getNeighbours(currentCell);
+        const probability = [];
 
-            for (let neighbour of neighbours) {
-                const malus = this.isAlreadyVisited(neighbour, ant) ? this.ALREADY_VISITED_MALUS : 0;
-                const numerator = this.explorationRate + neighbour.getPheromone() ** this.alpha - malus;
-                const result = numerator / sumDenominator;
-                probability.push(result);
-            }
+        let sumDenominator = 0;
+        for (let neighbour of neighbours) {
+            const malus = this.isAlreadyVisited(neighbour, ant) ? this.ALREADY_VISITED_MALUS : 0;
+            sumDenominator += this.explorationRate + neighbour.getPheromone() ** this.alpha - malus;
+        }
 
-            const chosenCell = this.selectCell(ant, neighbours, probability);
+        for (let neighbour of neighbours) {
+            const malus = this.isAlreadyVisited(neighbour, ant) ? this.ALREADY_VISITED_MALUS : 0;
+            const numerator = this.explorationRate + neighbour.getPheromone() ** this.alpha - malus;
+            const result = numerator / sumDenominator;
+            probability.push(result);
+        }
 
-            this.ants.set(ant, chosenCell);
-            ant.getHistory().push(chosenCell);
+        const chosenCell = this.selectCell(ant, neighbours, probability);
 
-            if (chosenCell instanceof Food && chosenCell.getFoodQuantity() > 0) {
-                ant.setTransport(0.1);
-                grid.getCell(chosenCell.row, chosenCell.col).addFoodQuantity(-0.1);
-                ant.setBackToStartCell(true);
-                grid.getShortestPath(chosenCell, ant);
-                ant.pathLength = ant.getHistory().length;
-                this.backToStartCell(ant)
-            }
+        this.ants.set(ant, chosenCell);
+        ant.getHistory().push(chosenCell);
+
+        if (chosenCell instanceof Food && chosenCell.getFoodQuantity() > 0) {
+            ant.setTransport(0.1);
+            grid.getCell(chosenCell.row, chosenCell.col).addFoodQuantity(-0.1);
+            ant.setBackToStartCell(true);
+            grid.getShortestPath(chosenCell, ant);
+            ant.pathLength = ant.getHistory().length;
+            this.backToStartCell(ant)
         }
     }
 

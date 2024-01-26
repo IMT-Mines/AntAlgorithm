@@ -160,24 +160,14 @@ class Canvas {
 
             const initX = ant.x;
             const initY = ant.y;
-            const destX = cell.col;
-            const destY = cell.row;
+            const destX = cell.col * cellWidth;
+            const destY = cell.row * cellHeight;
 
-            const xDiff = destX - initX;
-            const yDiff = destY - initY;
+            const angle = Math.atan2(destY - initY, destX - initX);
+            const rotation = angle + Math.PI;
 
-            const normalizedDeltaTime = deltaTime / 1000;
-            const deltaX = Options.CELL_PER_SECOND * xDiff * normalizedDeltaTime;
-            const deltaY = Options.CELL_PER_SECOND * yDiff * normalizedDeltaTime;
-
-            const rotation = Math.atan2(yDiff, xDiff) + Math.PI;
-
-            ant.x += deltaX;
-            ant.y += deltaY;
-
-            // TODO: fix ant rotation
             this.ctx.save();
-            this.ctx.translate(ant.x * cellWidth + cellWidth / 2, ant.y * cellHeight + cellHeight / 2);
+            this.ctx.translate(ant.x + cellWidth / 2, ant.y + cellHeight / 2);
             this.ctx.rotate(rotation);
             this.ctx.drawImage(this.antAsset, -cellWidth / 2, -cellHeight / 2, cellWidth, cellHeight);
             this.ctx.restore();

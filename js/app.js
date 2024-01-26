@@ -10,8 +10,9 @@ class Model {
         this.clock = new Clock(this.tick.bind(this));
         this.time = new Time();
         this.grid = new Grid(Options.SIZE, Options.FOOD_COUNT);
+        this.cellSize = Options.CANVAS_SIZE / Options.SIZE;
         this.antsManager = new AntsManager();
-        this.antsManager.initAnts(this.grid.startCell, Options.ANTS_COUNT);
+        this.antsManager.initAnts(this.grid, Options.ANTS_COUNT, this.cellSize);
         this.history = [];
         if (this.updateActionButtonText)
             this.updateActionButtonText("Start");
@@ -42,15 +43,13 @@ class Model {
     }
 
     tick(deltaTime) {
-        this.timeAccumulator += deltaTime / 1000;
-
-        if (this.timeAccumulator >= 1 / Options.CELL_PER_SECOND) {
-            this.antsManager.moveAnts(this.grid);
-            this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE);
-            this.updateHistory();
-            this.timeAccumulator -= 1 / Options.CELL_PER_SECOND;
+        for (const [ant, goal] of this.antsManager.ants) {
+            ant.move(goal, deltaTime, this.cellSize);
+            if (this.antsManager.hasReachGoal(ant, this.cellSize)) {
+                this.antsManager.getNextGoal(ant, this.grid);
+            }
+            // this.updateHistory();
         }
-
         this.displayCanvasCells(this.grid, this.antsManager.ants, deltaTime);
         this.updateChronometer(this.time.getFormattedElapsedTime());
     }
@@ -251,6 +250,7 @@ class Options {
     static PHEROMONE_EVAPORATION_RATE = 0.97;
     static MAX_HISTORY_LENGTH = 100;
     static CELL_PER_SECOND = 6;
+    static CANVAS_SIZE = 500;
 }
 
 // TODO: REMOVE IT (FOR TESTS ONLY or not?)
