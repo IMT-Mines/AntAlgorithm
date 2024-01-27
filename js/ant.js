@@ -1,6 +1,6 @@
 class Ant {
 
-    SPEED = 25;
+    SPEED = 40;
 
     transport = 0;
     history = [];
