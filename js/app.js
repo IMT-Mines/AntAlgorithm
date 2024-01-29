@@ -85,6 +85,12 @@ class Model {
         this.tick(1000 / this.clock.fps * Options.CELL_PER_SECOND);
     }
 
+    bindChangeSpeed(fps) {
+        for (const [ant, goal] of this.antsManager.ants) {
+            ant.SPEED = fps;
+        }
+    }
+
     bindActionButton() {
         if (this.clock.isRunning()) {
             this.clock.stop();
@@ -129,6 +135,10 @@ class View {
         this.bindParameters = callback;
     }
 
+    bindChangeSpeed(callback) {
+        this.bindChangeSpeed = callback;
+    }
+
 
     initView() {
         this.canvas = new Canvas(document.getElementById('canvas').getContext('2d'));
@@ -162,24 +172,23 @@ class View {
 
         this.slow = document.getElementById('slow');
         this.slow.addEventListener('click', () => {
-            Options.CELL_PER_SECOND = 1;
+            this.bindChangeSpeed(15);
         });
 
         this.medium = document.getElementById('normal');
         this.medium.addEventListener('click', () => {
-            Options.CELL_PER_SECOND = 6;
+            this.bindChangeSpeed(40);
         });
 
         this.fast = document.getElementById('fast');
         this.fast.addEventListener('click', () => {
-            Options.CELL_PER_SECOND = 12;
+            this.bindChangeSpeed(200);
         });
 
         this.veryFast = document.getElementById('crazy');
         this.veryFast.addEventListener('click', () => {
-            Options.CELL_PER_SECOND = 60;
+            this.bindChangeSpeed(300);
         });
-
     }
 
     displayChronometer(value) {
@@ -204,6 +213,7 @@ class Controller {
         this.view.bindForwardButton(this.bindForwardButton.bind(this));
         this.view.bindActionButton(this.bindActionButton.bind(this));
         this.view.bindParameters(this.bindParameters.bind(this));
+        this.view.bindChangeSpeed(this.bindChangeSpeed.bind(this));
 
         this.model.bindDisplayChronometer(this.bindDisplayChronometer.bind(this));
         this.model.bindDisplayCanvasCells(this.bindDisplayCanvasCells.bind(this));
@@ -212,6 +222,10 @@ class Controller {
         this.view.canvas.loadAssets().then(() => {
             this.model.updateCanvasCells(this.model.grid, [], 0);
         });
+    }
+
+    bindChangeSpeed(fps) {
+        this.model.bindChangeSpeed(fps);
     }
 
     bindParameters(parameters) {
@@ -241,7 +255,6 @@ class Controller {
     bindActionButton() {
         this.model.bindActionButton();
     }
-
 }
 
 class Options {

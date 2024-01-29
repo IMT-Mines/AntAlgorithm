@@ -21,7 +21,6 @@ class AntsManager {
         this.dropParameter = dropParameter;
     }
 
-
     initAnts(grid, antNumber, cellSize) {
         const startCell = grid.startCell;
         for (let i = 0; i < antNumber; i++) {
@@ -88,7 +87,6 @@ class AntsManager {
         return false;
     }
 
-
     selectCell(ant, cells, probabilities) {
         const probability = Math.random();
         let cumulativeProbability = 0;
@@ -101,12 +99,6 @@ class AntsManager {
         return cells[cells.length - 1];
     }
 
-    /**
-     * The ant goes back to the start cell by depiling the history. if the cell is start cell, the ant will drop the food and
-     * go back to the exploration, else it will drop pheromone on the path with a quantity depending on the length of the path
-     * // TODO Adapt quantity with length of path
-     * @param ant
-     */
     backToStartCell(ant) {
         const cell = ant.getHistory().pop();
         if (!cell) return;
@@ -122,7 +114,6 @@ class AntsManager {
             this.dropPheromone(ant, cell);
         }
     }
-
 
     dropPheromone(ant, cell) {
         cell.addPheromone(this.dropParameter / ant.pathLength);

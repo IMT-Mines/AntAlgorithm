@@ -100,13 +100,6 @@ class Canvas {
             64, 64,
             col * cellWidth, row * cellHeight,
             cellWidth, cellHeight);
-
-        // draw text coordinates
-        this.ctx.fillStyle = "black";
-        this.ctx.font = "10px Arial";
-        this.ctx.fillText(`${row}, ${col}`, col * cellWidth + 5, row * cellHeight + 10);
-
-
     }
 
     drawStartAndFood(cell, row, col, cellWidth, cellHeight) {
@@ -151,6 +144,11 @@ class Canvas {
         const color = Math.floor(pheromone * 255);
         this.ctx.fillStyle = color === 0 ? "white" : `rgb(${color}, 0, ${255 - color})`;
         this.ctx.fillRect(col * cellWidth + cellWidth * 0.25, row * cellHeight + cellHeight * 0.25, cellWidth / 2, cellHeight / 2);
+
+        // print pheromone value
+        this.ctx.fillStyle = "black";
+        this.ctx.font = "10px Arial";
+        this.ctx.fillText(Math.floor(pheromone * 100) / 100, col * cellWidth + cellWidth * 0.25, row * cellHeight + cellHeight * 0.25);
     }
 
 
@@ -169,7 +167,8 @@ class Canvas {
             this.ctx.save();
             this.ctx.translate(ant.x + cellWidth / 2, ant.y + cellHeight / 2);
             this.ctx.rotate(rotation);
-            this.ctx.drawImage(this.antAsset, -cellWidth / 2, -cellHeight / 2, cellWidth, cellHeight);
+            // size divide by 2
+            this.ctx.drawImage(this.antAsset, -cellWidth / 4, -cellHeight / 4, cellWidth / 2, cellHeight / 2);
             this.ctx.restore();
 
             // this.ctx.drawImage(this.antAsset, ant.x * cellWidth, ant.y * cellHeight, cellWidth /2, cellHeight /2);
