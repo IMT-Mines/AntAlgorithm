@@ -80,7 +80,10 @@ class Canvas {
                 this.drawGround(cell, row, col, cellWidth, cellHeight);
                 this.drawStartAndFood(cell, row, col, cellWidth, cellHeight);
                 this.drawObstacles(cell, row, col, cellWidth, cellHeight);
-                this.drawPheromones(cell, row, col, cellWidth, cellHeight, maxPheromone);
+                if (Options.DISPLAY_PHEROMONE)
+                    this.drawPheromones(cell, row, col, cellWidth, cellHeight, maxPheromone);
+                if (Options.DEBUG_PHEROMONE_VALUE)
+                    this.drawDebug(cell, row, col, cellWidth, cellHeight);
             }
         }
         this.drawAnts(antsMap, cellWidth, cellHeight, deltaTime);
@@ -101,7 +104,7 @@ class Canvas {
             128, 128,
             col * cellWidth, row * cellHeight,
             cellWidth, cellHeight);
-        if (cell instanceof Food && cell.getFoodQuantity() > 0) {
+        if (cell instanceof Food && cell.getFoodQuantity() >= 0.1) {
             const foodQuantityMultiplier = Math.max(cell.getFoodQuantity(), 0.7);
 
             this.ctx.drawImage(this.foodAndColonyAsset,
@@ -148,8 +151,8 @@ class Canvas {
             const numberOfCircle = Math.floor(RandomNumberGenerator.next() * 3) + 1;
 
             for (let i = 0; i < numberOfCircle; i++) {
-                const x = col * cellWidth + cell.getRandomPheromone().x * cellWidth;
-                const y = row * cellHeight + cell.getRandomPheromone().y * cellHeight;
+                const x = col * cellWidth + (cell.getRandomPheromone().x + 0.1) * (cellWidth * 0.9);
+                const y = row * cellHeight + (cell.getRandomPheromone().y + 0.1) * (cellHeight * 0.9);
                 const radius = cell.getRandomPheromone().r;
                 this.ctx.beginPath();
                 this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
@@ -157,6 +160,14 @@ class Canvas {
                 this.ctx.fillStyle = `rgb(${color}, 0, ${255 - color})`;
                 this.ctx.fill();
             }
+        }
+    }
+
+    drawDebug(cell, row, col, cellWidth, cellHeight) {
+        if (Options.DEBUG_PHEROMONE_VALUE) {
+            this.ctx.fillStyle = "black";
+            this.ctx.font = "10px Arial";
+            this.ctx.fillText("" + Math.floor(cell.getPheromone() * 100) / 100, col * cellWidth + cellWidth * 0.25, row * cellHeight + cellHeight * 0.25);
         }
     }
 

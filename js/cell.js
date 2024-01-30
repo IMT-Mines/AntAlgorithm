@@ -9,10 +9,15 @@ class Cell {
         this.pheromone = 0.0;
         this.randomPattern = this.possibleGround[Math.floor(RandomNumberGenerator.next() * this.possibleGround.length)];
         this.randomPattern.x += (Math.floor(RandomNumberGenerator.next() * 3) < 2 ? 128 : 0);
-        this.randomPheromone = { x: 0, y: 0, r: 0 };
-        this.randomPheromone.x = RandomNumberGenerator.next();
-        this.randomPheromone.y = RandomNumberGenerator.next();
-        this.randomPheromone.r = Math.floor(RandomNumberGenerator.next() * 4) + 2;
+        this.randomPheromone = {
+            x: RandomNumberGenerator.next(),
+            y: RandomNumberGenerator.next(),
+            r: Math.floor(RandomNumberGenerator.next() * 4) + 2
+        };0
+    }
+
+    setPheromone(pheromone) {
+        this.pheromone = pheromone;
     }
 
     addPheromone(quantity) {
@@ -27,13 +32,26 @@ class Cell {
         this.pheromone *= rate;
     }
 
+    setRandomPattern(x, y) {
+        this.randomPattern = { x: x, y: y };
+    }
+
     getRandomPattern() {
         return this.randomPattern;
+    }
+
+    setRandomPheromone(x, y, r) {
+        this.randomPheromone = { x: x, y: y, r: r };
     }
 
     getRandomPheromone() {
         return this.randomPheromone;
     }
+
+    clone() {
+
+    }
+
 }
 
 class Obstacle extends Cell {
@@ -70,6 +88,10 @@ class Start extends Cell {
 
     addFoodQuantity(quantity) {
         this.foodQuantity += quantity;
+    }
+
+    getFoodQuantity() {
+        return this.foodQuantity;
     }
 }
 

@@ -70,10 +70,10 @@ class AntsManager {
         this.ants.set(ant, chosenCell);
         ant.getHistory().push(chosenCell);
 
-        if (chosenCell instanceof Food && chosenCell.getFoodQuantity() > 0) {
+        if (chosenCell instanceof Food && chosenCell.getFoodQuantity() >= 0.1) {
             ant.setTransport(0.1);
-            ant.foodTransport = chosenCell;
             grid.getCell(chosenCell.row, chosenCell.col).addFoodQuantity(-0.1);
+            ant.foodTransport = chosenCell;
             ant.setBackToStartCell(true);
             grid.getShortestPath(chosenCell, ant);
             ant.pathLength = ant.getHistory().length;
@@ -110,8 +110,8 @@ class AntsManager {
 
         if (cell instanceof Start) {
             ant.getHistory().push(cell);
-            ant.setTransport(0);
             cell.addFoodQuantity(ant.getTransport());
+            ant.setTransport(0);
             ant.pathLength = 0;
             ant.setBackToStartCell(false);
             ant.foodTransport = undefined;
@@ -129,9 +129,8 @@ class AntsManager {
         for (let ant of this.ants.keys()) {
             const clonedAnt = new Ant();
             const clonedHistory = [];
-            for (let cell of ant.getHistory()) {
-                clonedHistory.push(cell); // Todo maybe clone cell
-            }
+            for (let cell of ant.getHistory())
+                clonedHistory.push(cell);
             clonedAnt.setHistory(clonedHistory);
             clonedAnt.setBackToStartCell(ant.isBackToStartCell());
             clone.ants.set(clonedAnt, this.ants.get(ant));

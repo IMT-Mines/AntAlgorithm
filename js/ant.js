@@ -1,6 +1,6 @@
 class Ant {
 
-    SPEED = 40;
+    static SPEED = 40;
 
     transport = 0;
     history = [];
@@ -19,8 +19,8 @@ class Ant {
         );
         const dx = Math.cos(direction);
         const dy = Math.sin(direction) * -1;
-        this.x += dx * this.SPEED / delaTime;
-        this.y += dy * this.SPEED / delaTime;
+        this.x += dx * Ant.SPEED / delaTime;
+        this.y += dy * Ant.SPEED / delaTime;
     }
 
     getTransport() {

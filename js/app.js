@@ -10,7 +10,6 @@ class Model {
         this.time = new Time();
         this.grid = new Grid(Options.SIZE, Options.FOOD_COUNT);
         this.cellSize = Options.CANVAS_SIZE / Options.SIZE;
-        this.showPheromones = false;
         this.antsManager = new AntsManager();
         this.antsManager.initAnts(this.grid, Options.ANTS_COUNT, this.cellSize);
         this.history = [];
@@ -20,11 +19,6 @@ class Model {
 
     bindDisplayChronometer(callBack) {
         this.updateChronometer = callBack;
-    }
-
-    bindShowPheromones() {
-        this.showPheromones = !this.showPheromones;
-        console.log("showPheromones: " + this.showPheromones)
     }
 
     bindDisplayCanvasCells(callBack) {
@@ -70,9 +64,9 @@ class Model {
                 this.updateHistory();
             }
         }
-        // this.updateHistory();
         this.displayCanvasCells(this.grid, this.antsManager.ants, deltaTime);
         this.updateChronometer(this.time.getFormattedElapsedTime());
+        if (this.grid.getStartCell().getFoodQuantity() >= Options.FOOD_COUNT) this.clock.stop();
     }
 
     updateHistory() {
@@ -95,7 +89,7 @@ class Model {
             this.time = last.time;
             this.antsManager = last.antsManager;
             for (const [ant, goal] of this.antsManager.ants) {
-                ant.move(goal, 18, this.cellSize);
+                ant.move(goal, 20, this.cellSize);
             }
             this.displayCanvasCells(this.grid, this.antsManager.ants, 0);
         }
@@ -104,18 +98,14 @@ class Model {
     bindForwardButton() {
         if (!this.time.hasBeenStarted())
             this.time.start();
-        for (const [ant, goal] of this.antsManager.ants) {
-            ant.move(goal, 1, this.cellSize);
-            this.antsManager.getNextGoal(ant, this.grid);
-        }
-        this.displayCanvasCells(this.grid, this.antsManager.ants, 0);
-        this.updateChronometer(this.time.getFormattedElapsedTime());
+        const previousSpeed = Ant.SPEED;
+        Ant.SPEED = 40;
+        this.tick(5);
+        Ant.SPEED = previousSpeed;
     }
 
     bindChangeSpeed(fps) {
-        for (const [ant, goal] of this.antsManager.ants) {
-            ant.SPEED = fps;
-        }
+        Ant.SPEED = fps;
     }
 
     bindActionButton() {
@@ -167,11 +157,6 @@ class View {
         this.bindChangeSpeed = callback;
     }
 
-    bindShowPheromones(callback) {
-        this.bindShowPheromones = callback;
-    }
-
-
     initView() {
         this.canvas = new Canvas(document.getElementById('canvas').getContext('2d'));
 
@@ -194,10 +179,15 @@ class View {
 
         this.showPheromones = document.getElementById('showPheromones');
         this.showPheromones.addEventListener('click', () => {
-            this.bindShowPheromones();
+            Options.DISPLAY_PHEROMONE = !Options.DISPLAY_PHEROMONE;
             this.showPheromones.classList.toggle("active");
         });
 
+        this.showDebug = document.getElementById("showDebug");
+        this.showDebug.addEventListener('click', () => {
+            Options.DEBUG_PHEROMONE_VALUE = !Options.DEBUG_PHEROMONE_VALUE;
+            this.showDebug.classList.toggle("active");
+        });
 
         this.parameters = document.getElementById('form');
         this.parameters.addEventListener('submit', (e) => {
@@ -252,7 +242,6 @@ class Controller {
         this.view.bindActionButton(this.bindActionButton.bind(this));
         this.view.bindParameters(this.bindParameters.bind(this));
         this.view.bindChangeSpeed(this.bindChangeSpeed.bind(this));
-        this.view.bindShowPheromones(this.bindShowPheromones.bind(this));
 
         this.model.bindDisplayChronometer(this.bindDisplayChronometer.bind(this));
         this.model.bindDisplayCanvasCells(this.bindDisplayCanvasCells.bind(this));
@@ -261,10 +250,6 @@ class Controller {
         this.view.canvas.loadAssets().then(() => {
             this.model.updateCanvasCells(this.model.grid, [], 0);
         });
-    }
-
-    bindShowPheromones() {
-        this.model.bindShowPheromones();
     }
 
     bindChangeSpeed(fps) {
@@ -308,6 +293,8 @@ class Options {
     static MAX_HISTORY_LENGTH = 100;
     static CANVAS_SIZE = 500;
     static SEED = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+    static DISPLAY_PHEROMONE = false;
+    static DEBUG_PHEROMONE_VALUE = false;
 }
 
 const app = new Controller(new Model(), new View());
