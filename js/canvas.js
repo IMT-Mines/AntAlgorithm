@@ -38,15 +38,6 @@ class Canvas {
     }
 
     draw(grid, antsMap, deltaTime) {
-        let maxPheromone = 0;
-        for (let col = 0; col < grid.cells.length; col++) {
-            for (let row = 0; row < grid.cells[col].length; row++) {
-                const cell = grid.cells[row][col];
-                if (cell instanceof Free) {
-                    maxPheromone = Math.max(maxPheromone, cell.getPheromone());
-                }
-            }
-        }
         const cellWidth = this.width / grid.cells.length;
         const cellHeight = this.height / grid.cells.length;
         this.ctx.clearRect(0, 0, this.width, this.height);
@@ -54,16 +45,17 @@ class Canvas {
         for (let col = 0; col < grid.cells.length; col++) {
             for (let row = 0; row < grid.cells[col].length; row++) {
                 const cell = grid.cells[row][col];
+                const ratio = grid.getMaxPheromone() / cell.getMaxPheromone();
                 this.drawGround(cell, row, col, cellWidth, cellHeight);
                 this.drawStartAndFood(cell, row, col, cellWidth, cellHeight);
                 this.drawObstacles(cell, row, col, cellWidth, cellHeight);
                 if (Options.DISPLAY_PHEROMONE)
-                    this.drawPheromones(cell, row, col, cellWidth, cellHeight, maxPheromone);
+                    this.drawPheromones(cell, row, col, cellWidth, cellHeight, ratio);
                 if (Options.DEBUG_PHEROMONE_VALUE)
                     this.drawDebug(cell, row, col, cellWidth, cellHeight);
             }
         }
-        this.drawAnts(antsMap, cellWidth, cellHeight, deltaTime);
+        this.drawAnts(antsMap, cellWidth, cellHeight);
     }
 
     drawGround(cell, row, col, cellWidth, cellHeight) {
@@ -120,23 +112,24 @@ class Canvas {
         }
     }
 
-    drawPheromones(cell, row, col, cellWidth, cellHeight, maxPheromone) {
-        if (!(cell instanceof Free)) return;
-        const pheromone = cell.getPheromone();
-        const color = Math.floor(pheromone / maxPheromone * 255);
-        if (pheromone > 0.01) {
-            const numberOfCircle = Math.floor(RandomNumberGenerator.next() * 3) + 1;
+    drawPheromones(cell, row, col, cellWidth, cellHeight, maxRatio) {
+        if (!(cell instanceof Free) || isNaN(maxRatio) || maxRatio === Infinity) return;
 
-            for (let i = 0; i < numberOfCircle; i++) {
-                const x = col * cellWidth + (cell.getRandomPheromone().x + 0.1) * (cellWidth * 0.9);
-                const y = row * cellHeight + (cell.getRandomPheromone().y + 0.1) * (cellHeight * 0.9);
-                const radius = cell.getRandomPheromone().r;
-                this.ctx.beginPath();
-                this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        console.log(cell.getMaxPheromone(), maxRatio)
+        const color = Math.floor(cell.getMaxPheromone() * 255 / maxRatio);
+        // console.log(color);
 
-                this.ctx.fillStyle = `rgb(${color}, 0, ${255 - color})`;
-                this.ctx.fill();
-            }
+        const numberOfCircle = Math.floor(RandomNumberGenerator.next() * 3) + 1;
+
+        for (let i = 0; i < numberOfCircle; i++) {
+            const x = col * cellWidth + (cell.getRandomPheromone().x + 0.2) * (cellWidth * 0.8);
+            const y = row * cellHeight + (cell.getRandomPheromone().y + 0.2) * (cellHeight * 0.8);
+            const radius = cell.getRandomPheromone().r;
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+
+            this.ctx.fillStyle = `rgb(${color}, 0, ${255 - color})`;
+            this.ctx.fill();
         }
     }
 
@@ -160,7 +153,7 @@ class Canvas {
     }
 
 
-    drawAnts(antsMap, cellWidth, cellHeight, deltaTime) {
+    drawAnts(antsMap, cellWidth, cellHeight) {
         for (let ant of antsMap.keys()) {
             const cell = antsMap.get(ant);
 

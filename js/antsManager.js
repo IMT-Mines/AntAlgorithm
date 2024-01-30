@@ -44,6 +44,18 @@ class AntsManager {
     }
 
     getNextGoal(ant, grid) {
+        let maxPheromone = 0;
+        for (let col = 0; col < grid.cells.length; col++) {
+            for (let row = 0; row < grid.cells[col].length; row++) {
+                const cell = grid.cells[row][col];
+                if (cell instanceof Free) {
+                    maxPheromone = Math.max(maxPheromone, cell.getMaxPheromone());
+                }
+            }
+        }
+
+        grid.setMaxPheromone(maxPheromone);
+
         if (ant.isBackToStartCell()) {
             this.backToStartCell(ant);
             return;

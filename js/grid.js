@@ -4,6 +4,7 @@ class Grid {
         this.cells = [];
         this.foodNumber = foodNumber;
         this.foodPlaced = 0;
+        this.maxPheromone = 0;
         this.initCells(cellNumber, additionalObstaclesRatio);
     }
 
@@ -176,8 +177,18 @@ class Grid {
         }
     }
 
+    setMaxPheromone(maxPheromone) {
+        this.maxPheromone = maxPheromone;
+    }
+
+    getMaxPheromone() {
+        return this.maxPheromone;
+    }
+
     clone() {
         const grid = new Grid(this.cells.length, this.foodNumber);
+        grid.maxPheromone = this.maxPheromone;
+        grid.foodNumber = this.foodPlaced;
         for (let row = 0; row < this.cells.length; row++) {
             for (let col = 0; col < this.cells[row].length; col++) {
                 grid.setCell(row, col, this.cells[row][col].clone());

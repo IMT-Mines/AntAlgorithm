@@ -7,6 +7,7 @@ class Cell {
         this.col = col;
         this.visited = false; // for maze generation
         this.pheromone = 0.0;
+        this.maxPheromone = 0.0;
         this.randomPattern = this.possibleGround[Math.floor(RandomNumberGenerator.next() * this.possibleGround.length)];
         this.randomPattern.x += (Math.floor(RandomNumberGenerator.next() * 3) < 2 ? 128 : 0);
         this.randomPheromone = {
@@ -16,12 +17,22 @@ class Cell {
         };
     }
 
+    setMaxPheromone(pheromone) {
+        this.maxPheromone = pheromone;
+    }
+
+    getMaxPheromone() {
+        return this.maxPheromone;
+    }
+
     setPheromone(pheromone) {
         this.pheromone = pheromone;
     }
 
     addPheromone(quantity) {
         this.pheromone += quantity;
+        if (this.pheromone > this.maxPheromone)
+            this.maxPheromone = this.pheromone;
     }
 
     getPheromone() {
@@ -52,6 +63,7 @@ class Cell {
         const clonedCell = new classType(this.row, this.col);
         clonedCell.setPheromone(this.pheromone);
         clonedCell.setRandomPattern(this.randomPattern);
+        clonedCell.setMaxPheromone(this.maxPheromone)
         clonedCell.setRandomPheromone({ x: this.randomPheromone.x, y: this.randomPheromone.y, r: this.randomPheromone.r });
         return clonedCell;
     }
