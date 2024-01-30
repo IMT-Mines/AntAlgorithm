@@ -53,19 +53,26 @@ class AntsManager {
         const probability = [];
 
         let sumDenominator = 0;
+        let chosenCell = null;
         for (let neighbour of neighbours) {
             const malus = this.isAlreadyVisited(neighbour, ant) ? this.alreadyVisitedMalus : 0;
             sumDenominator += this.explorationRate + neighbour.getPheromone() ** this.alpha - malus;
+            if (neighbour instanceof Food && neighbour.getFoodQuantity() >= 0.1) { // If the neighbour has food, we choose it
+                chosenCell = neighbour;
+                break;
+            }
         }
 
-        for (let neighbour of neighbours) {
-            const malus = this.isAlreadyVisited(neighbour, ant) ? this.alreadyVisitedMalus : 0;
-            const numerator = this.explorationRate + neighbour.getPheromone() ** this.alpha - malus;
-            const result = numerator / sumDenominator;
-            probability.push(result);
-        }
+        if (chosenCell == null) {
+            for (let neighbour of neighbours) {
+                const malus = this.isAlreadyVisited(neighbour, ant) ? this.alreadyVisitedMalus : 0;
+                const numerator = this.explorationRate + neighbour.getPheromone() ** this.alpha - malus;
+                const result = numerator / sumDenominator;
+                probability.push(result);
+            }
 
-        const chosenCell = this.selectCell(ant, neighbours, probability);
+            chosenCell = this.selectCell(ant, neighbours, probability);
+        }
 
         this.ants.set(ant, chosenCell);
         ant.getHistory().push(chosenCell);
