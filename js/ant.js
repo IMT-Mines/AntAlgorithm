@@ -2,13 +2,15 @@ class Ant {
 
     static SPEED = 40;
 
-    transport = 0;
-    history = [];
-    pathLength = 0;
-    backToStartCell = false;
-    foodTransport;
-    x = 0;
-    y = 0;
+    constructor() {
+        this.transportQuantity = 0;
+        this.history = [];
+        this.returnPathLength = 0;
+        this.backToStartCell = false;
+        this.foodCellTransport = undefined
+        this.x = 0;
+        this.y = 0;
+    }
 
     move(goal, delaTime, cellSize) {
         const goalX = goal.col * cellSize;
@@ -23,12 +25,44 @@ class Ant {
         this.y += dy * Ant.SPEED / delaTime;
     }
 
-    getTransport() {
-        return this.transport;
+    getX() {
+        return this.x;
     }
 
-    setTransport(transport) {
-        this.transport = transport;
+    getY() {
+        return this.y;
+    }
+
+    setX(x) {
+        this.x = x;
+    }
+
+    setY(y) {
+        this.y = y;
+    }
+
+    getReturnPathLength() {
+        return this.returnPathLength;
+    }
+
+    setReturnPathLength(returnPathLength) {
+        this.returnPathLength = returnPathLength;
+    }
+
+    setFoodCellTransport(foodCell) {
+        this.foodCellTransport = foodCell;
+    }
+
+    getFoodCellTransport() {
+        return this.foodCellTransport;
+    }
+
+    getTransportQuantity() {
+        return this.transportQuantity;
+    }
+
+    setTransportQuantity(transportQuantity) {
+        this.transportQuantity = transportQuantity;
     }
 
     getHistory() {

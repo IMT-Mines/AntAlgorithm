@@ -28,8 +28,8 @@ class AntsManager {
         const startCell = grid.startCell;
         for (let i = 0; i < antNumber; i++) {
             const ant = new Ant();
-            ant.x = startCell.col * cellSize;
-            ant.y = startCell.row * cellSize;
+            ant.setX(startCell.col * cellSize);
+            ant.setY(startCell.row * cellSize);
             ant.getHistory().push(startCell)
             this.ants.set(ant, startCell);
             this.getNextGoal(ant, grid);
@@ -40,7 +40,7 @@ class AntsManager {
         const goal = this.ants.get(ant);
         const goalX = goal.col * cellSize;
         const goalY = goal.row * cellSize;
-        return Math.abs(ant.x - goalX) <= 5 && Math.abs(ant.y - goalY) <= 5;
+        return Math.abs(ant.getX() - goalX) <= 5 && Math.abs(ant.getY() - goalY) <= 5;
     }
 
     getNextGoal(ant, grid) {
@@ -78,12 +78,12 @@ class AntsManager {
         ant.getHistory().push(chosenCell);
 
         if (chosenCell instanceof Food && chosenCell.getFoodQuantity() >= 0.1) {
-            ant.setTransport(0.1);
+            ant.setTransportQuantity(0.1);
             grid.getCell(chosenCell.row, chosenCell.col).addFoodQuantity(-0.1);
-            ant.foodTransport = chosenCell;
+            ant.setFoodCellTransport(chosenCell);
             ant.setBackToStartCell(true);
             grid.getShortestPath(chosenCell, ant);
-            ant.pathLength = ant.getHistory().length;
+            ant.setReturnPathLength(ant.getHistory().length);
             this.backToStartCell(ant)
         }
     }
@@ -117,18 +117,18 @@ class AntsManager {
 
         if (cell instanceof Start) {
             ant.getHistory().push(cell);
-            cell.addFoodQuantity(ant.getTransport());
-            ant.setTransport(0);
-            ant.pathLength = 0;
+            cell.addFoodQuantity(ant.getTransportQuantity());
+            ant.setTransportQuantity(0);
+            ant.setReturnPathLength(0);
             ant.setBackToStartCell(false);
-            ant.foodTransport = undefined;
+            ant.setFoodCellTransport(undefined);
         } else {
             this.dropPheromone(ant, cell);
         }
     }
 
     dropPheromone(ant, cell) {
-        cell.addPheromone(this.dropParameter / ant.pathLength);
+        cell.addPheromone(this.dropParameter / ant.getReturnPathLength());
     }
 
     clone() {
