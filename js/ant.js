@@ -6,6 +6,7 @@ class Ant {
     history = [];
     pathLength = 0;
     backToStartCell = false;
+    foodTransport;
     x = 0;
     y = 0;
 

@@ -5,6 +5,7 @@ class Model {
     }
 
     init() {
+        RandomNumberGenerator.setSeed(Options.SEED);
         this.clock = new Clock(this.tick.bind(this));
         this.time = new Time();
         this.grid = new Grid(Options.SIZE, Options.FOOD_COUNT);
@@ -39,10 +40,18 @@ class Model {
         this.antsManager.setExplorationRate(parseFloat(parameters.explorationRate));
         this.antsManager.setAlpha(parseFloat(parameters.alpha));
         this.antsManager.setAlreadyVisitedMalus(parseFloat(parameters.alreadyVisitedMalus));
+
         if (Options.SIZE !== parseInt(parameters.gridSize) ||
             Options.FOOD_COUNT !== parseInt(parameters.food) ||
             Options.ANTS_COUNT !== parseInt(parameters.ants) ||
-            Options.PHEROMONE_EVAPORATION_RATE !== parseFloat(parameters.pheromonesEvaporation)) {
+            Options.PHEROMONE_EVAPORATION_RATE !== parseFloat(parameters.pheromonesEvaporation) ||
+            Options.SEED !== parseInt(parameters.seed)
+        ) {
+            Options.SEED = parseInt(parameters.seed);
+            if (Options.SEED === 0) {
+                Options.SEED = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+            }
+
             Options.SIZE = parseInt(parameters.gridSize);
             Options.FOOD_COUNT = parseInt(parameters.food);
             Options.ANTS_COUNT = parseInt(parameters.ants);
@@ -298,9 +307,7 @@ class Options {
     static PHEROMONE_EVAPORATION_RATE = 0.005;
     static MAX_HISTORY_LENGTH = 100;
     static CANVAS_SIZE = 500;
+    static SEED = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 }
-
-// TODO: REMOVE IT (FOR TESTS ONLY or not?)
-RandomNumberGenerator.setSeed(14933);
 
 const app = new Controller(new Model(), new View());

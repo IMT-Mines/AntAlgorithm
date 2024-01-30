@@ -159,8 +159,6 @@ class Canvas {
         }
 
 
-
-
         // print pheromone value
         this.ctx.fillStyle = "black";
         this.ctx.font = "10px Arial";
@@ -185,6 +183,15 @@ class Canvas {
             this.ctx.rotate(rotation);
             this.ctx.drawImage(this.antAsset, -cellWidth / 4, -cellHeight / 4, cellWidth / 2, cellHeight / 2);
             this.ctx.restore();
+
+            if (ant.isBackToStartCell()) {
+                const foodCell = ant.foodTransport;
+                this.ctx.drawImage(this.foodAndColonyAsset,
+                    foodCell.getRandomPattern() * 32, 14 * 32,
+                    32, 32,
+                    ant.x + cellWidth / 4, ant.y + cellHeight / 4,
+                    cellWidth / 2, cellHeight / 2);
+            }
         }
     }
 
@@ -249,7 +256,7 @@ class Canvas {
         const blockIndex = wall ? wall.blockIndex : 6;
         const blockX = blockIndex % this.BLOCK_PER_ROW;
         const blockY = Math.floor(blockIndex / this.BLOCK_PER_ROW);
-        return { blockX, blockY };
+        return {blockX, blockY};
     }
 
 }

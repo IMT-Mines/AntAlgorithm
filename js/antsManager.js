@@ -72,6 +72,7 @@ class AntsManager {
 
         if (chosenCell instanceof Food && chosenCell.getFoodQuantity() > 0) {
             ant.setTransport(0.1);
+            ant.foodTransport = chosenCell;
             grid.getCell(chosenCell.row, chosenCell.col).addFoodQuantity(-0.1);
             ant.setBackToStartCell(true);
             grid.getShortestPath(chosenCell, ant);
@@ -113,6 +114,7 @@ class AntsManager {
             cell.addFoodQuantity(ant.getTransport());
             ant.pathLength = 0;
             ant.setBackToStartCell(false);
+            ant.foodTransport = undefined;
         } else {
             this.dropPheromone(ant, cell);
         }
