@@ -7,7 +7,6 @@ class Clock {
         this.frameDuration = 1000 / this.fps;
         this.callBack = callBack;
         this.running = false;
-        this.actualFps = 0;
     }
 
     start() {
@@ -26,7 +25,6 @@ class Clock {
         if (this.deltaTime > this.frameDuration) {
             this.lastTime = this.now - (this.deltaTime % this.frameDuration);
             this.callBack(this.deltaTime);
-            this.actualFps = 1000 / this.deltaTime;
         }
 
         if (this.running) {

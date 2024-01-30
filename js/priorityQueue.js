@@ -2,6 +2,7 @@ class PriorityQueue {
     constructor() {
         this.heap = [];
     }
+
     getLeftChildIndex(parentIndex) {
         return 2 * parentIndex + 1;
     }
@@ -39,18 +40,10 @@ class PriorityQueue {
         return this.priority(this.getRightChildIndex(index));
     }
  
-    parent(index) {
-        return this.heap[this.getParentIndex(index)];
-    }
- 
     swap(indexOne, indexTwo) {
         const temp = this.heap[indexOne];
         this.heap[indexOne] = this.heap[indexTwo];
         this.heap[indexTwo] = temp;
-    }
- 
-    peek() {
-        return this.isEmpty() ? null : this.heap[0];
     }
 
     remove() {
@@ -92,10 +85,6 @@ class PriorityQueue {
             }
             index = smallerChildIndex;
         }
-    }
-
-    contains(cell) {
-        return this.heap.find(element => element.cell === cell) !== undefined;
     }
 
     isEmpty() {
