@@ -3,6 +3,7 @@ class Grid {
     constructor(cellNumber, foodNumber, additionalObstaclesRatio = 0.15) {
         this.cells = [];
         this.foodNumber = foodNumber;
+        this.foodPlaced = 0;
         this.initCells(cellNumber, additionalObstaclesRatio);
     }
 
@@ -68,8 +69,10 @@ class Grid {
                 randomCol = Math.floor(RandomNumberGenerator.next() * (cellNumber - 2)) + 1;
                 currentIteration++;
             }
-            if (currentIteration < maxIterations)
+            if (currentIteration < maxIterations) {
+                this.foodPlaced++;
                 this.setCell(randomRow, randomCol, new Food(randomRow, randomCol));
+            }
         }
     }
 
@@ -189,5 +192,9 @@ class Grid {
             }
         }
         return grid;
+    }
+
+    getFoodPlaced() {
+        return this.foodPlaced;
     }
 }

@@ -17,6 +17,33 @@ class Model {
             this.updateActionButtonText("Start");
     }
 
+    tick(deltaTime) {
+        for (const [ant, goal] of this.antsManager.ants) {
+            ant.move(goal, deltaTime, this.cellSize);
+            if (this.antsManager.hasReachGoal(ant, this.cellSize)) {
+                this.antsManager.getNextGoal(ant, this.grid);
+                this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE / this.antsManager.ants.size);
+                this.updateHistory();
+            }
+        }
+        this.displayCanvasCells(this.grid, this.antsManager.ants, deltaTime);
+        this.updateChronometer(this.time.getFormattedElapsedTime());
+        if (this.grid.getStartCell().getFoodQuantity() >= this.grid.getFoodPlaced()) this.clock.stop();
+    }
+
+    updateHistory() {
+        this.history.push({
+            antsManager: this.antsManager.clone(),
+            grid: this.grid.clone(),
+        });
+        if (this.history.length > Options.MAX_HISTORY_LENGTH)
+            this.history.shift();
+    }
+
+    updateCanvasCells(cells, ants) {
+        this.displayCanvasCells(this.grid, ants, 0);
+    }
+
     bindDisplayChronometer(callBack) {
         this.updateChronometer = callBack;
     }
@@ -30,6 +57,7 @@ class Model {
     }
 
     bindParameters(parameters) {
+        this.clock.stop();
         this.antsManager.setDropParameter(parseFloat(parameters.pheromonesDrop));
         this.antsManager.setExplorationRate(parseFloat(parameters.explorationRate));
         this.antsManager.setAlpha(parseFloat(parameters.alpha));
@@ -51,35 +79,10 @@ class Model {
             Options.ANTS_COUNT = parseInt(parameters.ants);
             Options.PHEROMONE_EVAPORATION_RATE = parseFloat(parameters.pheromonesEvaporation);
             this.init();
+            this.time.start();
+            this.updateChronometer(this.time.getFormattedElapsedTime());
             this.updateCanvasCells(this.grid, this.antsManager.ants);
         }
-    }
-
-    tick(deltaTime) {
-        for (const [ant, goal] of this.antsManager.ants) {
-            ant.move(goal, deltaTime, this.cellSize);
-            if (this.antsManager.hasReachGoal(ant, this.cellSize)) {
-                this.antsManager.getNextGoal(ant, this.grid);
-                this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE / this.antsManager.ants.size);
-                this.updateHistory();
-            }
-        }
-        this.displayCanvasCells(this.grid, this.antsManager.ants, deltaTime);
-        this.updateChronometer(this.time.getFormattedElapsedTime());
-        if (this.grid.getStartCell().getFoodQuantity() >= Options.FOOD_COUNT) this.clock.stop();
-    }
-
-    updateHistory() {
-        this.history.push({
-            antsManager: this.antsManager.clone(),
-            grid: this.grid.clone(),
-        });
-        if (this.history.length > Options.MAX_HISTORY_LENGTH)
-            this.history.shift();
-    }
-
-    updateCanvasCells(cells, ants) {
-        this.displayCanvasCells(this.grid, ants, 0);
     }
 
     bindBackwardButton() {
