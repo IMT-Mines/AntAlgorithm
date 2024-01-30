@@ -102,11 +102,15 @@ class Canvas {
             col * cellWidth, row * cellHeight,
             cellWidth, cellHeight);
         if (cell instanceof Food && cell.getFoodQuantity() > 0) {
+            const foodQuantityMultiplier = Math.max(cell.getFoodQuantity(), 0.7);
+
             this.ctx.drawImage(this.foodAndColonyAsset,
                 cell.getRandomPattern() * 32, 14 * 32,
                 32, 32,
-                col * cellWidth, row * cellHeight,
-                cellWidth, cellHeight);
+                col * cellWidth + (1 - foodQuantityMultiplier) * cellWidth / 2,
+                row * cellHeight + (1 - foodQuantityMultiplier) * cellHeight / 2,
+                cellWidth * foodQuantityMultiplier,
+                cellHeight * foodQuantityMultiplier);
         } else if (cell instanceof Start) {
             this.ctx.drawImage(this.foodAndColonyAsset,
                 32 + cell.getRandomPattern() * 32, 20 * 32,
@@ -140,10 +144,7 @@ class Canvas {
         if (!(cell instanceof Free)) return;
         const pheromone = cell.getPheromone();
         const color = Math.floor(pheromone / maxPheromone * 255);
-        // draw little random circle in the cell to simulate pheromone particles
-        if (pheromone > 0) {
-            // draw between 1 and 3 circles in the cell
-            // and randomize the position but adapt the size with pheromone value
+        if (pheromone > 0.01) {
             const numberOfCircle = Math.floor(RandomNumberGenerator.next() * 3) + 1;
 
             for (let i = 0; i < numberOfCircle; i++) {
@@ -152,17 +153,11 @@ class Canvas {
                 const radius = cell.getRandomPheromone().r;
                 this.ctx.beginPath();
                 this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
-                // from blue to red
+
                 this.ctx.fillStyle = `rgb(${color}, 0, ${255 - color})`;
                 this.ctx.fill();
             }
         }
-
-
-        // print pheromone value
-        this.ctx.fillStyle = "black";
-        this.ctx.font = "10px Arial";
-        this.ctx.fillText(Math.floor(pheromone * 100) / 100, col * cellWidth + cellWidth * 0.25, row * cellHeight + cellHeight * 0.25);
     }
 
 

@@ -6,6 +6,12 @@
     --main-color-light: #a9a1ff;
 }
 
+h3 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--main-color);
+}
+
 canvas {
     background: #111111;
     width: 80vh;
@@ -38,13 +44,14 @@ canvas {
 }
 
 .button {
-    border-radius: 0.2rem;
-    padding: 0.25rem 0.5rem;
     border: var(--main-color) 1px solid;
     color: var(--main-color);
+    fill: var(--main-color);
+    border-radius: 0.2rem;
+    justify-content: center;
+    padding: 0.25rem 0.5rem;
     cursor: pointer;
     transition: 0.2s;
-    fill: var(--main-color);
     display: flex;
     align-items: center;
     gap: 5px;
@@ -61,16 +68,18 @@ canvas {
 
 .left {
     border-radius: 0.2rem 0 0 0.2rem !important;
-    border-right: none !important;
+    border: var(--main-color) 1px solid;
 }
 
 .right {
     border-radius: 0 0.2rem 0.2rem 0 !important;
+    border: var(--main-color) 1px solid;
     border-left: none !important;
 }
 
 .middle {
-
+    border: var(--main-color) 1px solid;
+    border-left: none !important;
     border-radius: 0 !important;
 }
 
@@ -93,6 +102,12 @@ input {
     gap: 5px;
 }
 
+.input-box {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
 .button:hover:not(:disabled) {
     background: var(--main-color);
     fill: white;
@@ -105,6 +120,27 @@ input {
     color: var(--main-color-light);
     border: var(--main-color-light) 1px solid;
     cursor: default;
+}
+
+.parameters-header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+}
+.parameters {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 200px;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 
@@ -126,6 +162,10 @@ input[type="radio"]:checked + label {
     transition: 0.2s;
 }
 
+label {
+    font-size: 13px;
+}
+
 label.toggle-option {
     padding: 0.25rem 0.5rem;
     cursor: pointer;
@@ -134,7 +174,6 @@ label.toggle-option {
     align-items: center;
     gap: 5px;
     border-radius: 0.2rem;
-    border: var(--main-color) 1px solid;
     color: var(--main-color);
     font-size: 13px;
 }

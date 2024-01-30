@@ -12,7 +12,7 @@ class Cell {
         this.randomPheromone = { x: 0, y: 0, r: 0 };
         this.randomPheromone.x = RandomNumberGenerator.next();
         this.randomPheromone.y = RandomNumberGenerator.next();
-        this.randomPheromone.r = Math.floor(RandomNumberGenerator.next() * 3) + 1;
+        this.randomPheromone.r = Math.floor(RandomNumberGenerator.next() * 4) + 2;
     }
 
     addPheromone(quantity) {

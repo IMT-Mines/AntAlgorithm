@@ -40,12 +40,12 @@ class Model {
         this.antsManager.setExplorationRate(parseFloat(parameters.explorationRate));
         this.antsManager.setAlpha(parseFloat(parameters.alpha));
         this.antsManager.setAlreadyVisitedMalus(parseFloat(parameters.alreadyVisitedMalus));
+        Options.PHEROMONE_EVAPORATION_RATE = parseFloat(parameters.pheromonesEvaporation);
 
         if (Options.SIZE !== parseInt(parameters.gridSize) ||
             Options.FOOD_COUNT !== parseInt(parameters.food) ||
             Options.ANTS_COUNT !== parseInt(parameters.ants) ||
-            Options.PHEROMONE_EVAPORATION_RATE !== parseFloat(parameters.pheromonesEvaporation) ||
-            Options.SEED !== parseInt(parameters.seed)
+            parseInt(parameters.seed) === 0 || Options.SEED !== parseInt(parameters.seed)
         ) {
             Options.SEED = parseInt(parameters.seed);
             if (Options.SEED === 0) {
@@ -304,7 +304,7 @@ class Options {
     static SIZE = 17;
     static FOOD_COUNT = 5;
     static ANTS_COUNT = 10;
-    static PHEROMONE_EVAPORATION_RATE = 0.005;
+    static PHEROMONE_EVAPORATION_RATE = 0.015;
     static MAX_HISTORY_LENGTH = 100;
     static CANVAS_SIZE = 500;
     static SEED = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
