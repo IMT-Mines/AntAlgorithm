@@ -55,7 +55,6 @@ class Model {
     tick(deltaTime) {
         for (const [ant, goal] of this.antsManager.ants) {
             ant.move(goal, deltaTime, this.cellSize);
-            this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE);
             if (this.antsManager.hasReachGoal(ant, this.cellSize)) {
                 this.antsManager.getNextGoal(ant, this.grid);
                 this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE / this.antsManager.ants.size);

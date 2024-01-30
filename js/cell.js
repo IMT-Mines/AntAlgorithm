@@ -5,11 +5,14 @@ class Cell {
     constructor(row, col) {
         this.row = row;
         this.col = col;
-        this.color = "#FFFFFF";
         this.visited = false; // for maze generation
         this.pheromone = 0.0;
         this.randomPattern = this.possibleGround[Math.floor(RandomNumberGenerator.next() * this.possibleGround.length)];
         this.randomPattern.x += (Math.floor(RandomNumberGenerator.next() * 3) < 2 ? 128 : 0);
+        this.randomPheromone = { x: 0, y: 0, r: 0 };
+        this.randomPheromone.x = RandomNumberGenerator.next();
+        this.randomPheromone.y = RandomNumberGenerator.next();
+        this.randomPheromone.r = Math.floor(RandomNumberGenerator.next() * 3) + 1;
     }
 
     addPheromone(quantity) {
@@ -24,12 +27,12 @@ class Cell {
         this.pheromone *= rate;
     }
 
-    getColor() {
-        return this.color;
-    }
-
     getRandomPattern() {
         return this.randomPattern;
+    }
+
+    getRandomPheromone() {
+        return this.randomPheromone;
     }
 }
 
@@ -37,7 +40,6 @@ class Obstacle extends Cell {
 
     constructor(row, col) {
         super(row, col);
-        this.color = "#111111";
     }
 }
 
@@ -45,7 +47,6 @@ class Food extends Cell {
 
     constructor(row, col) {
         super(row, col);
-        this.color = "#ffd500";
         this.foodQuantity = 1;
         this.randomPattern = Math.floor(RandomNumberGenerator.next() * 15);
     }
@@ -63,7 +64,6 @@ class Start extends Cell {
 
     constructor(row, col) {
         super(row, col);
-        this.color = "#00FF00";
         this.foodQuantity = 0;
         this.randomPattern = Math.floor(RandomNumberGenerator.next() * 12);
     }

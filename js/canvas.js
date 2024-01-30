@@ -61,6 +61,15 @@ class Canvas {
     }
 
     draw(grid, antsMap, deltaTime) {
+        let maxPheromone = 0;
+        for (let col = 0; col < grid.cells.length; col++) {
+            for (let row = 0; row < grid.cells[col].length; row++) {
+                const cell = grid.cells[row][col];
+                if (cell instanceof Free) {
+                    maxPheromone = Math.max(maxPheromone, cell.getPheromone());
+                }
+            }
+        }
         const cellWidth = this.width / grid.cells.length;
         const cellHeight = this.height / grid.cells.length;
         this.ctx.clearRect(0, 0, this.width, this.height);
@@ -71,7 +80,7 @@ class Canvas {
                 this.drawGround(cell, row, col, cellWidth, cellHeight);
                 this.drawStartAndFood(cell, row, col, cellWidth, cellHeight);
                 this.drawObstacles(cell, row, col, cellWidth, cellHeight);
-                this.drawPheromones(cell, row, col, cellWidth, cellHeight);
+                this.drawPheromones(cell, row, col, cellWidth, cellHeight, maxPheromone);
             }
         }
         this.drawAnts(antsMap, cellWidth, cellHeight, deltaTime);
@@ -86,6 +95,7 @@ class Canvas {
     }
 
     drawStartAndFood(cell, row, col, cellWidth, cellHeight) {
+        if (!(cell instanceof Start) && !(cell instanceof Food)) return;
         this.ctx.drawImage(this.grassAsset,
             0, 0,
             128, 128,
@@ -126,10 +136,10 @@ class Canvas {
         }
     }
 
-    drawPheromones(cell, row, col, cellWidth, cellHeight) {
+    drawPheromones(cell, row, col, cellWidth, cellHeight, maxPheromone) {
         if (!(cell instanceof Free)) return;
         const pheromone = cell.getPheromone();
-        const color = Math.floor(pheromone * 255);
+        const color = Math.floor(pheromone / maxPheromone * 255);
         // draw little random circle in the cell to simulate pheromone particles
         if (pheromone > 0) {
             // draw between 1 and 3 circles in the cell
@@ -137,9 +147,9 @@ class Canvas {
             const numberOfCircle = Math.floor(RandomNumberGenerator.next() * 3) + 1;
 
             for (let i = 0; i < numberOfCircle; i++) {
-                const radius = Math.floor(RandomNumberGenerator.next() * 3) + 1;
-                const x = col * cellWidth + Math.floor(RandomNumberGenerator.next() * cellWidth);
-                const y = row * cellHeight + Math.floor(RandomNumberGenerator.next() * cellHeight);
+                const x = col * cellWidth + cell.getRandomPheromone().x * cellWidth;
+                const y = row * cellHeight + cell.getRandomPheromone().y * cellHeight;
+                const radius = cell.getRandomPheromone().r;
                 this.ctx.beginPath();
                 this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
                 // from blue to red
