@@ -1,16 +1,19 @@
 class AntsManager {
 
-    ALREADY_VISITED_MALUS = 1;
-
     constructor() {
         this.alpha = 1;
         this.explorationRate = 1;
         this.dropParameter = 0.5;
+        this.alreadyVisitedMalus = 1;
         this.ants = new Map();
     }
 
     setAlpha(alpha) {
         this.alpha = alpha;
+    }
+
+    setAlreadyVisitedMalus(alreadyVisitedMalus) {
+        this.alreadyVisitedMalus = alreadyVisitedMalus;
     }
 
     setExplorationRate(explorationRate) {
@@ -51,12 +54,12 @@ class AntsManager {
 
         let sumDenominator = 0;
         for (let neighbour of neighbours) {
-            const malus = this.isAlreadyVisited(neighbour, ant) ? this.ALREADY_VISITED_MALUS : 0;
+            const malus = this.isAlreadyVisited(neighbour, ant) ? this.alreadyVisitedMalus : 0;
             sumDenominator += this.explorationRate + neighbour.getPheromone() ** this.alpha - malus;
         }
 
         for (let neighbour of neighbours) {
-            const malus = this.isAlreadyVisited(neighbour, ant) ? this.ALREADY_VISITED_MALUS : 0;
+            const malus = this.isAlreadyVisited(neighbour, ant) ? this.alreadyVisitedMalus : 0;
             const numerator = this.explorationRate + neighbour.getPheromone() ** this.alpha - malus;
             const result = numerator / sumDenominator;
             probability.push(result);

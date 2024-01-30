@@ -9,6 +9,7 @@ class Model {
         this.time = new Time();
         this.grid = new Grid(Options.SIZE, Options.FOOD_COUNT);
         this.cellSize = Options.CANVAS_SIZE / Options.SIZE;
+        this.showPheromones = false;
         this.antsManager = new AntsManager();
         this.antsManager.initAnts(this.grid, Options.ANTS_COUNT, this.cellSize);
         this.history = [];
@@ -20,6 +21,11 @@ class Model {
         this.updateChronometer = callBack;
     }
 
+    bindShowPheromones() {
+        this.showPheromones = !this.showPheromones;
+        console.log("showPheromones: " + this.showPheromones)
+    }
+
     bindDisplayCanvasCells(callBack) {
         this.displayCanvasCells = callBack;
     }
@@ -29,20 +35,27 @@ class Model {
     }
 
     bindParameters(parameters) {
-        Options.SIZE = parseInt(parameters.gridSize);
-        Options.FOOD_COUNT = parseInt(parameters.food);
-        Options.ANTS_COUNT = parseInt(parameters.ants);
-        Options.PHEROMONE_EVAPORATION_RATE = parseFloat(parameters.pheromonesEvaporation);
-        this.antsManager.setDropParameter(parseFloat(parameters.dropParameter));
+        this.antsManager.setDropParameter(parseFloat(parameters.pheromonesDrop));
         this.antsManager.setExplorationRate(parseFloat(parameters.explorationRate));
         this.antsManager.setAlpha(parseFloat(parameters.alpha));
-        this.init();
-        this.updateCanvasCells(this.grid, this.antsManager.ants);
+        this.antsManager.setAlreadyVisitedMalus(parseFloat(parameters.alreadyVisitedMalus));
+        if (Options.SIZE !== parseInt(parameters.gridSize) ||
+            Options.FOOD_COUNT !== parseInt(parameters.food) ||
+            Options.ANTS_COUNT !== parseInt(parameters.ants) ||
+            Options.PHEROMONE_EVAPORATION_RATE !== parseFloat(parameters.pheromonesEvaporation)) {
+            Options.SIZE = parseInt(parameters.gridSize);
+            Options.FOOD_COUNT = parseInt(parameters.food);
+            Options.ANTS_COUNT = parseInt(parameters.ants);
+            Options.PHEROMONE_EVAPORATION_RATE = parseFloat(parameters.pheromonesEvaporation);
+            this.init();
+            this.updateCanvasCells(this.grid, this.antsManager.ants);
+        }
     }
 
     tick(deltaTime) {
         for (const [ant, goal] of this.antsManager.ants) {
             ant.move(goal, deltaTime, this.cellSize);
+            this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE);
             if (this.antsManager.hasReachGoal(ant, this.cellSize)) {
                 this.antsManager.getNextGoal(ant, this.grid);
                 this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE / this.antsManager.ants.size);
@@ -122,6 +135,7 @@ class View {
         this.forwardButton;
         this.actionButton;
         this.parameters;
+        this.showPheromones;
         this.initView();
     }
 
@@ -145,6 +159,10 @@ class View {
         this.bindChangeSpeed = callback;
     }
 
+    bindShowPheromones(callback) {
+        this.bindShowPheromones = callback;
+    }
+
 
     initView() {
         this.canvas = new Canvas(document.getElementById('canvas').getContext('2d'));
@@ -164,6 +182,12 @@ class View {
         this.actionButton = document.getElementById('action');
         this.actionButton.addEventListener('click', () => {
             this.bindActionButton();
+        });
+
+        this.showPheromones = document.getElementById('showPheromones');
+        this.showPheromones.addEventListener('click', () => {
+            this.bindShowPheromones();
+            this.showPheromones.classList.toggle("active");
         });
 
 
@@ -220,6 +244,7 @@ class Controller {
         this.view.bindActionButton(this.bindActionButton.bind(this));
         this.view.bindParameters(this.bindParameters.bind(this));
         this.view.bindChangeSpeed(this.bindChangeSpeed.bind(this));
+        this.view.bindShowPheromones(this.bindShowPheromones.bind(this));
 
         this.model.bindDisplayChronometer(this.bindDisplayChronometer.bind(this));
         this.model.bindDisplayCanvasCells(this.bindDisplayCanvasCells.bind(this));
@@ -228,6 +253,10 @@ class Controller {
         this.view.canvas.loadAssets().then(() => {
             this.model.updateCanvasCells(this.model.grid, [], 0);
         });
+    }
+
+    bindShowPheromones() {
+        this.model.bindShowPheromones();
     }
 
     bindChangeSpeed(fps) {
@@ -264,16 +293,15 @@ class Controller {
 }
 
 class Options {
-    static SIZE = 10;
-    static FOOD_COUNT = 2;
-    static ANTS_COUNT = 1;
-    static PHEROMONE_EVAPORATION_RATE = 0.03;
+    static SIZE = 17;
+    static FOOD_COUNT = 5;
+    static ANTS_COUNT = 10;
+    static PHEROMONE_EVAPORATION_RATE = 0.005;
     static MAX_HISTORY_LENGTH = 100;
-    static CELL_PER_SECOND = 6;
     static CANVAS_SIZE = 500;
 }
 
 // TODO: REMOVE IT (FOR TESTS ONLY or not?)
-RandomNumberGenerator.setSeed(3);
+RandomNumberGenerator.setSeed(14933);
 
 const app = new Controller(new Model(), new View());

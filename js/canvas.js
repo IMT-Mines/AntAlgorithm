@@ -130,8 +130,26 @@ class Canvas {
         if (!(cell instanceof Free)) return;
         const pheromone = cell.getPheromone();
         const color = Math.floor(pheromone * 255);
-        this.ctx.fillStyle = color === 0 ? "white" : `rgb(${color}, 0, ${255 - color})`;
-        this.ctx.fillRect(col * cellWidth + cellWidth * 0.25, row * cellHeight + cellHeight * 0.25, cellWidth / 2, cellHeight / 2);
+        // draw little random circle in the cell to simulate pheromone particles
+        if (pheromone > 0) {
+            // draw between 1 and 3 circles in the cell
+            // and randomize the position but adapt the size with pheromone value
+            const numberOfCircle = Math.floor(RandomNumberGenerator.next() * 3) + 1;
+
+            for (let i = 0; i < numberOfCircle; i++) {
+                const radius = Math.floor(RandomNumberGenerator.next() * 3) + 1;
+                const x = col * cellWidth + Math.floor(RandomNumberGenerator.next() * cellWidth);
+                const y = row * cellHeight + Math.floor(RandomNumberGenerator.next() * cellHeight);
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                // from blue to red
+                this.ctx.fillStyle = `rgb(${color}, 0, ${255 - color})`;
+                this.ctx.fill();
+            }
+        }
+
+
+
 
         // print pheromone value
         this.ctx.fillStyle = "black";
