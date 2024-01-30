@@ -33,7 +33,7 @@ class Cell {
     }
 
     setRandomPattern(randomPattern) {
-        this.randomPattern = { x: randomPattern.x, y: randomPattern.y };
+        this.randomPattern = randomPattern;
     }
 
     getRandomPattern() {
@@ -62,6 +62,10 @@ class Obstacle extends Cell {
 
     constructor(row, col) {
         super(row, col);
+    }
+
+    clone(classType) {
+        return super.clone(Obstacle);
     }
 }
 
@@ -122,5 +126,9 @@ class Start extends Cell {
 class Free extends Cell {
     constructor(row, col) {
         super(row, col);
+    }
+
+    clone(classType) {
+        return super.clone(Free);
     }
 }
