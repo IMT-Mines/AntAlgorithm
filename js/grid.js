@@ -17,8 +17,9 @@ class Grid {
     generateDefaultGrid(cellNumber) {
         for (let row = 0; row < cellNumber; row++) {
             this.cells[row] = [];
-            for (let col = 0; col < cellNumber; col++)
+            for (let col = 0; col < cellNumber; col++) {
                 this.cells[row][col] = new Obstacle(row, col);
+            }
         }
     }
 
@@ -35,7 +36,7 @@ class Grid {
                 newCell.visited = true;
                 this.setCell(newCell.row, newCell.col, newCell);
                 stack.push(currentCell);
-                const vector = { x: (newCell.row - currentCell.row) / 2, y: (newCell.col - currentCell.col) / 2 };
+                const vector = {x: (newCell.row - currentCell.row) / 2, y: (newCell.col - currentCell.col) / 2};
                 const newBetweenCell = new Free(currentCell.row + vector.x, currentCell.col + vector.y);
                 this.setCell(newBetweenCell.row, newBetweenCell.col, newBetweenCell);
                 currentCell = newCell;
@@ -51,10 +52,13 @@ class Grid {
             this.cells[cellNumber - 1][i] = new Obstacle(cellNumber - 1, i);
         }
 
-        for (let row = 1; row < cellNumber - 1; row++)
-            for (let col = 1; col < cellNumber - 1; col++)
-                if (this.cells[row][col] instanceof Obstacle && RandomNumberGenerator.next() < additionalObstaclesRatio)
+        for (let row = 1; row < cellNumber - 1; row++) {
+            for (let col = 1; col < cellNumber - 1; col++) {
+                if (this.cells[row][col] instanceof Obstacle && RandomNumberGenerator.next() < additionalObstaclesRatio) {
                     this.setCell(row, col, new Free(row, col));
+                }
+            }
+        }
     }
 
     generateFood(cellNumber) {
@@ -139,10 +143,10 @@ class Grid {
     getNeighbours(cell, checkIfFree = true, neighboursDistance = 1) {
         const neighbours = [];
         const coordinates = [
-            { x: -1 * neighboursDistance, y:  0 },
-            { x:  0, y:  neighboursDistance },
-            { x:  neighboursDistance, y:  0},
-            { x:  0, y: -1 * neighboursDistance }
+            {x: -1 * neighboursDistance, y: 0},
+            {x: 0, y: neighboursDistance},
+            {x: neighboursDistance, y: 0},
+            {x: 0, y: -1 * neighboursDistance}
         ];
         for (let coordinate of coordinates) {
             if (cell.row + coordinate.x < 0 || cell.row + coordinate.x >= this.cells.length ||
@@ -166,7 +170,7 @@ class Grid {
         for (let row = 0; row < this.cells.length; row++) {
             for (let col = 0; col < this.cells[row].length; col++) {
                 if (this.cells[row][col] instanceof Free) {
-                    this.cells[row][col].multiplyPheromone(1-rate);
+                    this.cells[row][col].multiplyPheromone(1 - rate);
                 }
             }
         }
@@ -174,9 +178,11 @@ class Grid {
 
     clone() {
         const grid = new Grid(this.cells.length, this.foodNumber);
-        for (let row = 0; row < this.cells.length; row++)
-            for (let col = 0; col < this.cells[row].length; col++)
+        for (let row = 0; row < this.cells.length; row++) {
+            for (let col = 0; col < this.cells[row].length; col++) {
                 grid.setCell(row, col, this.cells[row][col].clone());
+            }
+        }
         return grid;
     }
 
