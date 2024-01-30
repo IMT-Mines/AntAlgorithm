@@ -80,4 +80,17 @@ class Ant {
     setBackToStartCell(backToStartCell) {
         this.backToStartCell = backToStartCell;
     }
+
+    clone() {
+        const clonedAnt = new Ant();
+        clonedAnt.setTransportQuantity(this.transportQuantity);
+        clonedAnt.setReturnPathLength(this.returnPathLength);
+        clonedAnt.setBackToStartCell(this.backToStartCell);
+        clonedAnt.setFoodCellTransport(this.foodCellTransport);
+        clonedAnt.setX(this.x);
+        clonedAnt.setY(this.y);
+        clonedAnt.setHistory(this.history.map(cell => cell.clone()));
+        return clonedAnt;
+    }
+
 }

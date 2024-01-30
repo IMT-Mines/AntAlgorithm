@@ -57,7 +57,6 @@ class Model {
     }
 
     bindParameters(parameters) {
-        this.clock.stop();
         this.antsManager.setDropParameter(parseFloat(parameters.pheromonesDrop));
         this.antsManager.setExplorationRate(parseFloat(parameters.explorationRate));
         this.antsManager.setAlpha(parseFloat(parameters.alpha));
@@ -69,6 +68,7 @@ class Model {
             Options.ANTS_COUNT !== parseInt(parameters.ants) ||
             parseInt(parameters.seed) === 0 || Options.SEED !== parseInt(parameters.seed)
         ) {
+            this.clock.stop();
             Options.SEED = parseInt(parameters.seed);
             if (Options.SEED === 0) {
                 Options.SEED = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
@@ -79,7 +79,7 @@ class Model {
             Options.ANTS_COUNT = parseInt(parameters.ants);
             Options.PHEROMONE_EVAPORATION_RATE = parseFloat(parameters.pheromonesEvaporation);
             this.init();
-            this.time.start();
+            this.bindActionButton();
             this.updateChronometer(this.time.getFormattedElapsedTime());
             this.updateCanvasCells(this.grid, this.antsManager.ants);
         }
@@ -89,7 +89,6 @@ class Model {
         if (this.history.length > 1) {
             const last = this.history.pop();
             this.grid = last.grid;
-            this.time = last.time;
             this.antsManager = last.antsManager;
             for (const [ant, goal] of this.antsManager.ants) {
                 ant.move(goal, 20, this.cellSize);

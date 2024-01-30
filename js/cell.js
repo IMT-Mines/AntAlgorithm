@@ -13,7 +13,7 @@ class Cell {
             x: RandomNumberGenerator.next(),
             y: RandomNumberGenerator.next(),
             r: Math.floor(RandomNumberGenerator.next() * 4) + 2
-        };0
+        };
     }
 
     setPheromone(pheromone) {
@@ -32,24 +32,28 @@ class Cell {
         this.pheromone *= rate;
     }
 
-    setRandomPattern(x, y) {
-        this.randomPattern = { x: x, y: y };
+    setRandomPattern(randomPattern) {
+        this.randomPattern = { x: randomPattern.x, y: randomPattern.y };
     }
 
     getRandomPattern() {
         return this.randomPattern;
     }
 
-    setRandomPheromone(x, y, r) {
-        this.randomPheromone = { x: x, y: y, r: r };
+    setRandomPheromone(randomPheromone) {
+        this.randomPheromone = { x: randomPheromone.x, y: randomPheromone.y, r: randomPheromone.r };
     }
 
     getRandomPheromone() {
         return this.randomPheromone;
     }
 
-    clone() {
-
+    clone(classType = Cell) {
+        const clonedCell = new classType(this.row, this.col);
+        clonedCell.setPheromone(this.pheromone);
+        clonedCell.setRandomPattern(this.randomPattern);
+        clonedCell.setRandomPheromone({ x: this.randomPheromone.x, y: this.randomPheromone.y, r: this.randomPheromone.r });
+        return clonedCell;
     }
 
 }
@@ -73,8 +77,18 @@ class Food extends Cell {
         this.foodQuantity += quantity;
     }
 
+    setFoodQuantity(quantity) {
+        this.foodQuantity = quantity;
+    }
+
     getFoodQuantity() {
         return this.foodQuantity;
+    }
+
+    clone(classType) {
+        const clonedCell = super.clone(Food);
+        clonedCell.setFoodQuantity(this.foodQuantity);
+        return clonedCell;
     }
 }
 
@@ -92,6 +106,16 @@ class Start extends Cell {
 
     getFoodQuantity() {
         return this.foodQuantity;
+    }
+
+    setFoodQuantity(quantity) {
+        this.foodQuantity = quantity;
+    }
+
+    clone(classType) {
+        const clonedCell = super.clone(Start);
+        clonedCell.setFoodQuantity(this.foodQuantity);
+        return clonedCell;
     }
 }
 

@@ -7,7 +7,6 @@ class Grid {
         this.initCells(cellNumber, additionalObstaclesRatio);
     }
 
-
     initCells(cellNumber, additionalObstaclesRatio) {
         this.generateDefaultGrid(cellNumber)
         this.generateMaze(cellNumber, additionalObstaclesRatio);
@@ -175,22 +174,9 @@ class Grid {
 
     clone() {
         const grid = new Grid(this.cells.length, this.foodNumber);
-        for (let row = 0; row < this.cells.length; row++) {
-            for (let col = 0; col < this.cells[row].length; col++) {
-                const cell = this.cells[row][col];
-                if (cell instanceof Obstacle) {
-                    grid.setCell(row, col, new Obstacle(row, col));
-                } else if (cell instanceof Food) {
-                    grid.setCell(row, col, new Food(row, col));
-                } else if (cell instanceof Start) {
-                    grid.setCell(row, col, new Start(row, col));
-                } else if (cell instanceof Free) {
-                    const newCell = new Free(row, col);
-                    newCell.pheromone = cell.pheromone;
-                    grid.setCell(row, col, newCell);
-                }
-            }
-        }
+        for (let row = 0; row < this.cells.length; row++)
+            for (let col = 0; col < this.cells[row].length; col++)
+                grid.setCell(row, col, this.cells[row][col].clone());
         return grid;
     }
 

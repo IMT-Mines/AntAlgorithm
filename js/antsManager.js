@@ -134,13 +134,8 @@ class AntsManager {
     clone() {
         const clone = new AntsManager();
         for (let ant of this.ants.keys()) {
-            const clonedAnt = new Ant();
-            const clonedHistory = [];
-            for (let cell of ant.getHistory())
-                clonedHistory.push(cell);
-            clonedAnt.setHistory(clonedHistory);
-            clonedAnt.setBackToStartCell(ant.isBackToStartCell());
-            clone.ants.set(clonedAnt, this.ants.get(ant));
+            const clonedAnt = ant.clone();
+            clone.ants.set(clonedAnt, this.ants.get(ant).clone());
         }
         return clone;
     }
