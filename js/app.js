@@ -1,7 +1,5 @@
 class Model {
 
-    timeAccumulator = 0;
-
     constructor() {
         this.init();
     }
@@ -45,12 +43,13 @@ class Model {
     tick(deltaTime) {
         for (const [ant, goal] of this.antsManager.ants) {
             ant.move(goal, deltaTime, this.cellSize);
-            this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE);
             if (this.antsManager.hasReachGoal(ant, this.cellSize)) {
                 this.antsManager.getNextGoal(ant, this.grid);
+                this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE / this.antsManager.ants.size);
+                this.updateHistory();
             }
-            // this.updateHistory();
         }
+        // this.updateHistory();
         this.displayCanvasCells(this.grid, this.antsManager.ants, deltaTime);
         this.updateChronometer(this.time.getFormattedElapsedTime());
     }
@@ -74,15 +73,22 @@ class Model {
             this.grid = last.grid;
             this.time = last.time;
             this.antsManager = last.antsManager;
-            this.updateChronometer(this.time.getFormattedElapsedTime());
-            this.displayCanvasCells(this.grid.getCells(), this.antsManager.ants, 0);
+            for (const [ant, goal] of this.antsManager.ants) {
+                ant.move(goal, 18, this.cellSize);
+            }
+            this.displayCanvasCells(this.grid, this.antsManager.ants, 0);
         }
     }
 
     bindForwardButton() {
         if (!this.time.hasBeenStarted())
             this.time.start();
-        this.tick(1000 / this.clock.fps * Options.CELL_PER_SECOND);
+        for (const [ant, goal] of this.antsManager.ants) {
+            ant.move(goal, 1, this.cellSize);
+            this.antsManager.getNextGoal(ant, this.grid);
+        }
+        this.displayCanvasCells(this.grid, this.antsManager.ants, 0);
+        this.updateChronometer(this.time.getFormattedElapsedTime());
     }
 
     bindChangeSpeed(fps) {
@@ -182,12 +188,12 @@ class View {
 
         this.fast = document.getElementById('fast');
         this.fast.addEventListener('click', () => {
-            this.bindChangeSpeed(200);
+            this.bindChangeSpeed(100);
         });
 
         this.veryFast = document.getElementById('crazy');
         this.veryFast.addEventListener('click', () => {
-            this.bindChangeSpeed(300);
+            this.bindChangeSpeed(200);
         });
     }
 
@@ -261,7 +267,7 @@ class Options {
     static SIZE = 10;
     static FOOD_COUNT = 2;
     static ANTS_COUNT = 1;
-    static PHEROMONE_EVAPORATION_RATE = 0.97;
+    static PHEROMONE_EVAPORATION_RATE = 0.03;
     static MAX_HISTORY_LENGTH = 100;
     static CELL_PER_SECOND = 6;
     static CANVAS_SIZE = 500;

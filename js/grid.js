@@ -164,7 +164,7 @@ class Grid {
         for (let row = 0; row < this.cells.length; row++) {
             for (let col = 0; col < this.cells[row].length; col++) {
                 if (this.cells[row][col] instanceof Free) {
-                    this.cells[row][col].multiplyPheromone(rate);
+                    this.cells[row][col].multiplyPheromone(1-rate);
                 }
             }
         }

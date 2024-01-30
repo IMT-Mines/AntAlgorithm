@@ -41,10 +41,6 @@ class Canvas {
         this.ctx.canvas.width *= devicePixelRatio;
         this.ctx.canvas.height *= devicePixelRatio;
         this.ctx.scale(devicePixelRatio, devicePixelRatio);
-        this.isFirstDraw = true;
-        this.randomFood = {};
-        this.randomStart = {};
-        this.randomGround = {};
     }
 
     loadImage(src) {
@@ -72,7 +68,6 @@ class Canvas {
         for (let col = 0; col < grid.cells.length; col++) {
             for (let row = 0; row < grid.cells[col].length; row++) {
                 const cell = grid.cells[row][col];
-                if (this.isFirstDraw) this.generateRandomValue(cell);
                 this.drawGround(cell, row, col, cellWidth, cellHeight);
                 this.drawStartAndFood(cell, row, col, cellWidth, cellHeight);
                 this.drawObstacles(cell, row, col, cellWidth, cellHeight);
@@ -80,38 +75,31 @@ class Canvas {
             }
         }
         this.drawAnts(antsMap, cellWidth, cellHeight, deltaTime);
-        this.isFirstDraw = false;
-    }
-
-    generateRandomValue(cell) {
-        if (cell instanceof Start) {
-            this.randomStart[cell] = Math.floor(RandomNumberGenerator.next() * 12);
-        } else if (cell instanceof Food) {
-            this.randomFood[cell] = Math.floor(RandomNumberGenerator.next() * 15);
-        }
-        const possibleGround = [{ x: 0, y: 0 }, { x: 64, y: 0 }, { x: 64, y: 64 }, { x: 64, y: 0 }]
-        this.randomGround[cell] = possibleGround[Math.floor(RandomNumberGenerator.next() * possibleGround.length)];
-        this.randomGround[cell].x += (Math.floor(RandomNumberGenerator.next() * 3) < 2 ? 128 : 0);
     }
 
     drawGround(cell, row, col, cellWidth, cellHeight) {
         this.ctx.drawImage(this.grassAsset,
-            this.randomGround[cell].x, this.randomGround[cell].y,
+            cell.getRandomPattern().x, cell.getRandomPattern().y,
             64, 64,
             col * cellWidth, row * cellHeight,
             cellWidth, cellHeight);
     }
 
     drawStartAndFood(cell, row, col, cellWidth, cellHeight) {
+        this.ctx.drawImage(this.grassAsset,
+            0, 0,
+            128, 128,
+            col * cellWidth, row * cellHeight,
+            cellWidth, cellHeight);
         if (cell instanceof Food && cell.getFoodQuantity() > 0) {
             this.ctx.drawImage(this.foodAndColonyAsset,
-                this.randomFood[cell] * 32, 14 * 32,
+                cell.getRandomPattern() * 32, 14 * 32,
                 32, 32,
                 col * cellWidth, row * cellHeight,
                 cellWidth, cellHeight);
         } else if (cell instanceof Start) {
             this.ctx.drawImage(this.foodAndColonyAsset,
-                32 + this.randomStart[cell] * 32, 20 * 32,
+                32 + cell.getRandomPattern() * 32, 20 * 32,
                 32, 32,
                 col * cellWidth, row * cellHeight,
                 cellWidth, cellHeight);
@@ -167,11 +155,8 @@ class Canvas {
             this.ctx.save();
             this.ctx.translate(ant.x + cellWidth / 2, ant.y + cellHeight / 2);
             this.ctx.rotate(rotation);
-            // size divide by 2
             this.ctx.drawImage(this.antAsset, -cellWidth / 4, -cellHeight / 4, cellWidth / 2, cellHeight / 2);
             this.ctx.restore();
-
-            // this.ctx.drawImage(this.antAsset, ant.x * cellWidth, ant.y * cellHeight, cellWidth /2, cellHeight /2);
         }
     }
 
