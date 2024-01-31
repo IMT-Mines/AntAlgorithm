@@ -8,16 +8,24 @@ class Canvas {
         foodAndColony: "assets/tiles/foodAndColony.png", // this.foodAndColonyAsset
     }
 
-    constructor(ctx) {
+    constructor(ctxBackground, ctx, ctxObstacle) {
+        this.ctxBackground = ctxBackground;
         this.ctx = ctx;
-        this.ctx.globalAlpha = 0.5;
+        this.ctxObstacle = ctxObstacle;
         this.ctx.fillStyle = "white";
         this.width = this.ctx.canvas.width;
         this.height = this.ctx.canvas.height;
+        this.scaleCanvas(this.ctx);
+        this.scaleCanvas(this.ctxBackground);
+        this.scaleCanvas(this.ctxObstacle);
+    }
+
+    scaleCanvas(ctx) {
         const devicePixelRatio = 5;
-        this.ctx.canvas.width *= devicePixelRatio;
-        this.ctx.canvas.height *= devicePixelRatio;
-        this.ctx.scale(devicePixelRatio, devicePixelRatio);
+        ctx.canvas.width *= devicePixelRatio;
+        ctx.canvas.height *= devicePixelRatio;
+        ctx.scale(devicePixelRatio, devicePixelRatio);
+
     }
 
     loadImage(src) {
@@ -37,7 +45,21 @@ class Canvas {
         return Promise.all(imagePromises);
     }
 
-    draw(grid, antsMap, deltaTime) {
+    drawBackgroundAndObstacles(grid) {
+        this.ctxBackground.clearRect(0, 0, this.width, this.height);
+        this.ctxObstacle.clearRect(0, 0, this.width, this.height);
+        const cellWidth = this.width / grid.cells.length;
+        const cellHeight = this.height / grid.cells.length;
+        for (let col = 0; col < grid.cells.length; col++) {
+            for (let row = 0; row < grid.cells[col].length; row++) {
+                const cell = grid.cells[row][col];
+                this.drawGround(cell, row, col, cellWidth, cellHeight);
+                this.drawObstacles(cell, row, col, cellWidth, cellHeight);
+            }
+        }
+    }
+
+    draw(grid, antsMap) {
         const cellWidth = this.width / grid.cells.length;
         const cellHeight = this.height / grid.cells.length;
         this.ctx.clearRect(0, 0, this.width, this.height);
@@ -46,9 +68,7 @@ class Canvas {
             for (let row = 0; row < grid.cells[col].length; row++) {
                 const cell = grid.cells[row][col];
                 const ratio = grid.getMaxPheromone() / cell.getMaxPheromone();
-                this.drawGround(cell, row, col, cellWidth, cellHeight);
                 this.drawStartAndFood(cell, row, col, cellWidth, cellHeight);
-                this.drawObstacles(cell, row, col, cellWidth, cellHeight);
                 if (Options.DISPLAY_PHEROMONE)
                     this.drawPheromones(cell, row, col, cellWidth, cellHeight, ratio);
                 if (Options.DEBUG_PHEROMONE_VALUE)
@@ -59,7 +79,7 @@ class Canvas {
     }
 
     drawGround(cell, row, col, cellWidth, cellHeight) {
-        this.ctx.drawImage(this.grassAsset,
+        this.ctxBackground.drawImage(this.grassAsset,
             cell.getRandomPattern().x, cell.getRandomPattern().y,
             64, 64,
             col * cellWidth, row * cellHeight,
@@ -94,21 +114,24 @@ class Canvas {
 
     drawObstacles(cell, row, col, cellWidth, cellHeight) {
         if (cell instanceof Obstacle) {
-            this.ctx.drawImage(this.grassAsset,
+            this.ctxObstacle.drawImage(this.grassAsset,
                 0, 0,
                 128, 128,
                 col * cellWidth, row * cellHeight,
                 cellWidth, cellHeight);
-            this.ctx.drawImage(this.shadowAsset,
+            this.ctxObstacle.drawImage(this.shadowAsset,
                 45, 96,
                 90, 56,
                 col * cellWidth, row * cellHeight,
                 cellWidth, cellHeight);
-            this.ctx.drawImage(this.treeAsset,
+            this.ctxObstacle.drawImage(this.treeAsset,
                 16, 16,
                 138, 150,
                 col * cellWidth - cellWidth * 0.2, row * cellHeight - cellHeight * 0.5,
                 cellWidth * 1.5, cellHeight * 1.8);
+        } else {
+            // make it transparent for the canvas under
+
         }
     }
 
@@ -135,14 +158,15 @@ class Canvas {
 
     drawDebug(cell, row, col, cellWidth, cellHeight) {
         if (Options.DEBUG_PHEROMONE_VALUE) {
+            const fontSize = Math.floor(cellWidth / 2.5);
             if (cell instanceof Free) {
                 const color = Math.floor(cell.getPheromone() / 0.1 * 255);
                 this.ctx.fillStyle = `rgb(${color}, 0, ${255 - color})`;
                 this.ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
                 this.ctx.fillStyle = "black";
-                this.ctx.font = "10px Arial";
-                this.ctx.fillText("" + Math.floor(cell.getPheromone() * 100) / 100, col * cellWidth + cellWidth / 2 - 10,
-                    row * cellHeight + cellHeight / 2 + 5);
+                this.ctx.font = fontSize + "px Arial";
+                this.ctx.fillText("" + Math.floor(cell.getPheromone() * 100) / 100, col * cellWidth + cellWidth / 2 - fontSize / 1.5,
+                    row * cellHeight + cellHeight / 2 + fontSize / 2);
             }
 
             if (cell instanceof Food) {

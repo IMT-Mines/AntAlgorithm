@@ -41,7 +41,7 @@ class Model {
     }
 
     updateCanvasCells(cells, ants) {
-        this.displayCanvasCells(this.grid, ants, 0);
+        this.displayCanvasCells(this.grid, ants);
     }
 
     bindDisplayChronometer(callBack) {
@@ -54,6 +54,10 @@ class Model {
 
     bindUpdateActionButtonText(callback) {
         this.updateActionButtonText = callback;
+    }
+
+    bindDrawBackgroundAndObstacles(callback) {
+        this.drawBackgroundAndObstacles = callback;
     }
 
     bindParameters(parameters) {
@@ -81,6 +85,7 @@ class Model {
             this.init();
             this.bindActionButton();
             this.updateChronometer(this.time.getFormattedElapsedTime());
+            this.drawBackgroundAndObstacles(this.grid);
             this.updateCanvasCells(this.grid, this.antsManager.ants);
         }
     }
@@ -93,7 +98,7 @@ class Model {
             for (const [ant, goal] of this.antsManager.ants) {
                 ant.move(goal, 20, this.cellSize);
             }
-            this.displayCanvasCells(this.grid, this.antsManager.ants, 0);
+            this.displayCanvasCells(this.grid, this.antsManager.ants);
         }
     }
 
@@ -160,7 +165,10 @@ class View {
     }
 
     initView() {
-        this.canvas = new Canvas(document.getElementById('canvas').getContext('2d'));
+        const background = document.getElementById('background').getContext('2d');
+        const canvas = document.getElementById('canvas').getContext('2d');
+        const obstacle = document.getElementById('obstacle').getContext('2d');
+        this.canvas = new Canvas(background, canvas, obstacle);
 
         this.chronometer = document.getElementById("chronometer");
 
@@ -221,12 +229,16 @@ class View {
         });
     }
 
+    drawBackgroundAndObstacles(grid) {
+        this.canvas.drawBackgroundAndObstacles(grid);
+    }
+
     displayChronometer(value) {
         this.chronometer.innerHTML = value;
     }
 
-    displayCanvasCells(grid, ants, deltaTime) {
-        this.canvas.draw(grid, ants, deltaTime);
+    displayCanvasCells(grid, ants) {
+        this.canvas.draw(grid, ants);
     }
 
     updateActionButtonText(text) {
@@ -248,9 +260,11 @@ class Controller {
         this.model.bindDisplayChronometer(this.bindDisplayChronometer.bind(this));
         this.model.bindDisplayCanvasCells(this.bindDisplayCanvasCells.bind(this));
         this.model.bindUpdateActionButtonText(this.bindUpdateActionButtonText.bind(this));
+        this.model.bindDrawBackgroundAndObstacles(this.bindDrawBackgroundAndObstacles.bind(this));
 
         this.view.canvas.loadAssets().then(() => {
-            this.model.updateCanvasCells(this.model.grid, [], 0);
+            this.view.drawBackgroundAndObstacles(this.model.grid);
+            this.model.updateCanvasCells(this.model.grid, []);
         });
     }
 
@@ -278,8 +292,12 @@ class Controller {
         this.view.displayChronometer(value);
     }
 
-    bindDisplayCanvasCells(grid, ants, deltaTime) {
-        this.view.displayCanvasCells(grid, ants, deltaTime);
+    bindDisplayCanvasCells(grid, ants) {
+        this.view.displayCanvasCells(grid, ants);
+    }
+
+    bindDrawBackgroundAndObstacles(grid) {
+        this.view.drawBackgroundAndObstacles(grid);
     }
 
     bindActionButton() {
