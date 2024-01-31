@@ -28,7 +28,8 @@ class Model {
         }
         this.displayCanvasCells(this.grid, this.antsManager.ants, deltaTime);
         this.updateChronometer(this.time.getFormattedElapsedTime());
-        if (this.grid.getStartCell().getFoodQuantity() >= this.grid.getFoodPlaced()) this.clock.stop();
+        // because of the IEEE 754 standard, we can't compare two floating point numbers so we use a threshold
+        if (this.grid.startCell.getFoodQuantity() >= this.grid.foodPlaced - 0.1) this.clock.stop();
     }
 
     updateHistory() {

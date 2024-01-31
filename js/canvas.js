@@ -138,7 +138,7 @@ class Canvas {
     drawPheromones(cell, row, col, cellWidth, cellHeight, maxRatio) {
         if (!(cell instanceof Free) || isNaN(maxRatio) || maxRatio === Infinity) return;
 
-        console.log(cell.getMaxPheromone(), maxRatio)
+        // console.log(cell.getMaxPheromone(), maxRatio)
         const color = Math.floor(cell.getMaxPheromone() * 255 / maxRatio);
         // console.log(color);
 
