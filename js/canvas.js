@@ -67,12 +67,11 @@ class Canvas {
         for (let col = 0; col < grid.cells.length; col++) {
             for (let row = 0; row < grid.cells[col].length; row++) {
                 const cell = grid.cells[row][col];
-                const ratio = grid.getMaxPheromone() / cell.getMaxPheromone();
                 this.drawStartAndFood(cell, row, col, cellWidth, cellHeight);
                 if (Options.DISPLAY_PHEROMONE)
-                    this.drawPheromones(cell, row, col, cellWidth, cellHeight, ratio);
+                    this.drawPheromones(cell, row, col, cellWidth, cellHeight, grid.getMaxPheromone());
                 if (Options.DEBUG_PHEROMONE_VALUE)
-                    this.drawDebug(cell, row, col, cellWidth, cellHeight);
+                    this.drawDebug(grid, cell, row, col, cellWidth, cellHeight);
             }
         }
         this.drawAnts(antsMap, cellWidth, cellHeight);
@@ -129,18 +128,13 @@ class Canvas {
                 138, 150,
                 col * cellWidth - cellWidth * 0.2, row * cellHeight - cellHeight * 0.5,
                 cellWidth * 1.5, cellHeight * 1.8);
-        } else {
-            // make it transparent for the canvas under
-
         }
     }
 
-    drawPheromones(cell, row, col, cellWidth, cellHeight, maxRatio) {
-        if (!(cell instanceof Free) || isNaN(maxRatio) || maxRatio === Infinity) return;
+    drawPheromones(cell, row, col, cellWidth, cellHeight, maxGridPheromone) {
+        if (!(cell instanceof Free) || maxGridPheromone === 0 || cell.getMaxPheromone() === 0) return;
 
-        // console.log(cell.getMaxPheromone(), maxRatio)
-        const color = Math.floor(cell.getMaxPheromone() * 255 / maxRatio);
-        // console.log(color);
+        const color = Math.floor(255 * cell.getMaxPheromone() / maxGridPheromone);
 
         const numberOfCircle = Math.floor(RandomNumberGenerator.next() * 3) + 1;
 
@@ -156,11 +150,12 @@ class Canvas {
         }
     }
 
-    drawDebug(cell, row, col, cellWidth, cellHeight) {
+    drawDebug(grid, cell, row, col, cellWidth, cellHeight) {
         if (Options.DEBUG_PHEROMONE_VALUE) {
             const fontSize = Math.floor(cellWidth / 2.5);
             if (cell instanceof Free) {
-                const color = Math.floor(cell.getPheromone() / 0.1 * 255);
+                const value = grid.getMaxPheromone() / cell.getMaxPheromone();
+                const color = Math.floor(cell.getMaxPheromone() * 255);
                 this.ctx.fillStyle = `rgb(${color}, 0, ${255 - color})`;
                 this.ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
                 this.ctx.fillStyle = "black";
@@ -205,4 +200,5 @@ class Canvas {
             }
         }
     }
+
 }

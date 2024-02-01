@@ -49,7 +49,9 @@ class AntsManager {
             for (let row = 0; row < grid.cells[col].length; row++) {
                 const cell = grid.cells[row][col];
                 if (cell instanceof Free) {
-                    maxPheromone = Math.max(maxPheromone, cell.getMaxPheromone());
+                    if (cell.getMaxPheromone() > maxPheromone) {
+                        maxPheromone = cell.getMaxPheromone();
+                    }
                 }
             }
         }
