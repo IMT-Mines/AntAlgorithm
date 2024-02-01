@@ -7,12 +7,17 @@ class Clock {
         this.frameDuration = 1000 / this.fps;
         this.callBack = callBack;
         this.running = false;
+        this.shouldBeDestroyed = false;
     }
 
     start() {
         this.lastTime = performance.now();
         this.running = true;
         this.run();
+    }
+
+    destroy() {
+        this.shouldBeDestroyed = true;
     }
 
     stop() {
@@ -26,8 +31,8 @@ class Clock {
             this.lastTime = this.now - (this.deltaTime % this.frameDuration);
             this.callBack(this.deltaTime);
         }
-
-        requestAnimationFrame(this.run.bind(this));
+        if (!this.shouldBeDestroyed)
+            requestAnimationFrame(this.run.bind(this));
     }
 
     isRunning() {

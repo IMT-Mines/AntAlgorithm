@@ -20,11 +20,13 @@ class Model {
     tick(deltaTime) {
         if (this.clock.isRunning()) {
             for (const [ant, goal] of this.antsManager.ants) {
-                ant.move(goal, deltaTime, this.cellSize);
-                if (this.antsManager.hasReachGoal(ant, this.cellSize)) {
-                    this.antsManager.getNextGoal(ant, this.grid);
-                    this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE / this.antsManager.ants.size);
-                    this.updateHistory();
+                for (let i = 0; i < Options.SPEED; i++) {
+                    ant.move(goal, deltaTime, this.cellSize);
+                    if (this.antsManager.hasReachGoal(ant, this.cellSize)) {
+                        this.antsManager.getNextGoal(ant, this.grid);
+                        this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE / this.antsManager.ants.size);
+                        this.updateHistory();
+                    }
                 }
             }
             // because of the IEEE 754 standard, we can't compare two floating point numbers so we use a threshold
@@ -76,7 +78,7 @@ class Model {
             Options.ANTS_COUNT !== parseInt(parameters.ants) ||
             parseInt(parameters.seed) === 0 || Options.SEED !== parseInt(parameters.seed)
         ) {
-            this.clock.stop();
+            this.clock.destroy();
             Options.SEED = parseInt(parameters.seed);
             if (Options.SEED === 0) {
                 Options.SEED = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
@@ -109,14 +111,7 @@ class Model {
     bindForwardButton() {
         if (!this.time.hasBeenStarted())
             this.time.start();
-        const previousSpeed = Ant.SPEED;
-        Ant.SPEED = 40;
         this.tick(5);
-        Ant.SPEED = previousSpeed;
-    }
-
-    bindChangeSpeed(fps) {
-        Ant.SPEED = fps;
     }
 
     bindActionButton() {
@@ -162,10 +157,6 @@ class View {
 
     bindParameters(callback) {
         this.bindParameters = callback;
-    }
-
-    bindChangeSpeed(callback) {
-        this.bindChangeSpeed = callback;
     }
 
     initView() {
@@ -214,22 +205,22 @@ class View {
 
         this.slow = document.getElementById('slow');
         this.slow.addEventListener('click', () => {
-            this.bindChangeSpeed(15);
+            Options.SPEED = 1;
         });
 
         this.medium = document.getElementById('normal');
         this.medium.addEventListener('click', () => {
-            this.bindChangeSpeed(40);
+            Options.SPEED = 2;
         });
 
         this.fast = document.getElementById('fast');
         this.fast.addEventListener('click', () => {
-            this.bindChangeSpeed(100);
+            Options.SPEED = 4;
         });
 
         this.veryFast = document.getElementById('crazy');
         this.veryFast.addEventListener('click', () => {
-            this.bindChangeSpeed(200);
+            Options.SPEED = 20;
         });
     }
 
@@ -259,7 +250,6 @@ class Controller {
         this.view.bindForwardButton(this.bindForwardButton.bind(this));
         this.view.bindActionButton(this.bindActionButton.bind(this));
         this.view.bindParameters(this.bindParameters.bind(this));
-        this.view.bindChangeSpeed(this.bindChangeSpeed.bind(this));
 
         this.model.bindDisplayChronometer(this.bindDisplayChronometer.bind(this));
         this.model.bindDisplayCanvasCells(this.bindDisplayCanvasCells.bind(this));
@@ -270,10 +260,6 @@ class Controller {
             this.view.drawBackgroundAndObstacles(this.model.grid);
             this.model.updateCanvasCells(this.model.grid, []);
         });
-    }
-
-    bindChangeSpeed(fps) {
-        this.model.bindChangeSpeed(fps);
     }
 
     bindParameters(parameters) {
@@ -314,11 +300,12 @@ class Options {
     static FOOD_COUNT = 5;
     static ANTS_COUNT = 10;
     static PHEROMONE_EVAPORATION_RATE = 0.015;
-    static MAX_HISTORY_LENGTH = 100;
+    static MAX_HISTORY_LENGTH = 500;
     static CANVAS_SIZE = 500;
     static SEED = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
     static DISPLAY_PHEROMONE = false;
     static DEBUG_PHEROMONE_VALUE = false;
+    static SPEED = 2;
 }
 
 const app = new Controller(new Model(), new View());
