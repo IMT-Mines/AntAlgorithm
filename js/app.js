@@ -18,18 +18,21 @@ class Model {
     }
 
     tick(deltaTime) {
-        for (const [ant, goal] of this.antsManager.ants) {
-            ant.move(goal, deltaTime, this.cellSize);
-            if (this.antsManager.hasReachGoal(ant, this.cellSize)) {
-                this.antsManager.getNextGoal(ant, this.grid);
-                this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE / this.antsManager.ants.size);
-                this.updateHistory();
+        if (this.clock.isRunning()) {
+            for (const [ant, goal] of this.antsManager.ants) {
+                ant.move(goal, deltaTime, this.cellSize);
+                if (this.antsManager.hasReachGoal(ant, this.cellSize)) {
+                    this.antsManager.getNextGoal(ant, this.grid);
+                    this.grid.updatePheromones(Options.PHEROMONE_EVAPORATION_RATE / this.antsManager.ants.size);
+                    this.updateHistory();
+                }
             }
+            // because of the IEEE 754 standard, we can't compare two floating point numbers so we use a threshold
+            this.updateChronometer(this.time.getFormattedElapsedTime());
+            if (this.grid.startCell.getFoodQuantity() >= this.grid.foodPlaced - 0.1) this.clock.stop();
         }
+        // Allow to toggle the display of pheromones / debug despite the clock is stopped
         this.displayCanvasCells(this.grid, this.antsManager.ants, deltaTime);
-        this.updateChronometer(this.time.getFormattedElapsedTime());
-        // because of the IEEE 754 standard, we can't compare two floating point numbers so we use a threshold
-        if (this.grid.startCell.getFoodQuantity() >= this.grid.foodPlaced - 0.1) this.clock.stop();
     }
 
     updateHistory() {

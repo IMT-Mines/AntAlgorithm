@@ -27,9 +27,7 @@ class Clock {
             this.callBack(this.deltaTime);
         }
 
-        if (this.running) {
-            requestAnimationFrame(this.run.bind(this));
-        }
+        requestAnimationFrame(this.run.bind(this));
     }
 
     isRunning() {
