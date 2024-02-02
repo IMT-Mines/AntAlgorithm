@@ -111,7 +111,13 @@ class Model {
     bindForwardButton() {
         if (!this.time.hasBeenStarted())
             this.time.start();
+        if (this.clock.isRunning()) return;
+        const previousSpeed = Options.SPEED;
+        Options.SPEED = 1;
+        this.clock.start();
         this.tick(5);
+        this.clock.stop();
+        Options.SPEED = previousSpeed;
     }
 
     bindActionButton() {
