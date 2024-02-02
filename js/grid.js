@@ -164,8 +164,8 @@ class Grid {
     }
 
     updatePheromones(rate) {
-        for (let row = 0; row < this.cells.length; row++) {
-            for (let col = 0; col < this.cells[row].length; col++) {
+        for (let row = 1; row < this.cells.length - 1; row++) {
+            for (let col = 1; col < this.cells[row].length - 1; col++) {
                 if (this.cells[row][col] instanceof Free) {
                     this.cells[row][col].multiplyPheromone(1 - rate);
                 }
