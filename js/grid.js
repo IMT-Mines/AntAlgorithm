@@ -45,13 +45,6 @@ class Grid {
             }
         }
 
-        for (let i = 0; i < cellNumber; i++) {
-            this.cells[i][0] = new Obstacle(i, 0);
-            this.cells[i][cellNumber - 1] = new Obstacle(i, cellNumber - 1);
-            this.cells[0][i] = new Obstacle(0, i);
-            this.cells[cellNumber - 1][i] = new Obstacle(cellNumber - 1, i);
-        }
-
         for (let row = 1; row < cellNumber - 1; row++) {
             for (let col = 1; col < cellNumber - 1; col++) {
                 if (this.cells[row][col] instanceof Obstacle && RandomNumberGenerator.next() < additionalObstaclesRatio) {
