@@ -31,7 +31,7 @@ class Model {
             }
             // because of the IEEE 754 standard, we can't compare two floating point numbers so we use a threshold
             this.updateChronometer(this.time.getFormattedElapsedTime());
-            if (this.grid.startCell.getFoodQuantity() >= this.grid.foodPlaced - 0.1) this.clock.stop();
+            if (this.grid.startCell.getFoodQuantity() >= this.grid.getFoodNumber() - 0.1) this.clock.stop();
         }
         // Allow to toggle the display of pheromones / debug despite the clock is stopped
         this.displayCanvasCells(this.grid, this.antsManager.ants, deltaTime);

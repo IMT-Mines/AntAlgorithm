@@ -3,7 +3,6 @@ class Grid {
     constructor(cellNumber, foodNumber, additionalObstaclesRatio = 0.15) {
         this.cells = [];
         this.foodNumber = foodNumber;
-        this.foodPlaced = 0;
         this.maxPheromone = 0;
         this.initCells(cellNumber, additionalObstaclesRatio);
     }
@@ -63,20 +62,24 @@ class Grid {
     }
 
     generateFood(cellNumber) {
-        const maxIterations = 5000;
+        const freeCells = [];
+        for (let row = 1; row < cellNumber - 1; row++) {
+            for (let col = 1; col < cellNumber - 1; col++) {
+                if (this.cells[row][col] instanceof Cell) {
+                    freeCells.push({row: row, col: col});
+                }
+            }
+        }
+        if (freeCells.length < this.foodNumber) {
+            this.foodNumber = freeCells.length;
+        }
         for (let i = 0; i < this.foodNumber; i++) {
-            let randomRow = Math.floor(RandomNumberGenerator.next() * (cellNumber - 2)) + 1;
-            let randomCol = Math.floor(RandomNumberGenerator.next() * (cellNumber - 2)) + 1;
-            let currentIteration = 0;
-            while (!(this.cells[randomRow][randomCol] instanceof Cell) && currentIteration < maxIterations) {
-                randomRow = Math.floor(RandomNumberGenerator.next() * (cellNumber - 2)) + 1;
-                randomCol = Math.floor(RandomNumberGenerator.next() * (cellNumber - 2)) + 1;
-                currentIteration++;
-            }
-            if (currentIteration < maxIterations) {
-                this.foodPlaced++;
-                this.setCell(randomRow, randomCol, new Food(randomRow, randomCol));
-            }
+            // get a random cell out of the free cells
+            const randomIndex = Math.floor(RandomNumberGenerator.next() * freeCells.length);
+            const randomCell = freeCells[randomIndex];
+            freeCells.splice(randomIndex, 1);
+            const food = new Food(randomCell.row, randomCell.col);
+            this.setCell(randomCell.row, randomCell.col, food);
         }
     }
 
@@ -185,19 +188,19 @@ class Grid {
         return this.maxPheromone;
     }
 
+    getFoodNumber() {
+        return this.foodNumber;
+    }
+
     clone() {
         const grid = new Grid(this.cells.length, this.foodNumber);
         grid.maxPheromone = this.maxPheromone;
-        grid.foodNumber = this.foodPlaced;
+        grid.foodNumber = this.foodNumber;
         for (let row = 0; row < this.cells.length; row++) {
             for (let col = 0; col < this.cells[row].length; col++) {
                 grid.setCell(row, col, this.cells[row][col].clone());
             }
         }
         return grid;
-    }
-
-    getFoodPlaced() {
-        return this.foodPlaced;
     }
 }
