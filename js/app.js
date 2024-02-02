@@ -305,7 +305,7 @@ class Options {
     static SIZE = 17;
     static FOOD_COUNT = 5;
     static ANTS_COUNT = 10;
-    static PHEROMONE_EVAPORATION_RATE = 0.015;
+    static PHEROMONE_EVAPORATION_RATE = 0.005;
     static MAX_HISTORY_LENGTH = 500;
     static CANVAS_SIZE = 500;
     static SEED = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);

@@ -4,7 +4,7 @@ class AntsManager {
         this.alpha = 1;
         this.explorationRate = 1;
         this.dropParameter = 0.5;
-        this.alreadyVisitedMalus = 1.5;
+        this.alreadyVisitedMalus = 1;
         this.ants = new Map();
     }
 
